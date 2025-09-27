@@ -5,7 +5,8 @@ public class PokemonCard : Card
     public bool IsEx { get; set; }
     public bool IsMega { get; set; }
 
-    public PokemonStage Stage { get; set; }
+    public int StageId { get; set; }
+    public required PokemonStage Stage { get; set; }
 
     public int Hp { get; set; }
 

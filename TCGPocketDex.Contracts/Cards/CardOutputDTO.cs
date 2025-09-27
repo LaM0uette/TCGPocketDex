@@ -1,0 +1,31 @@
+﻿namespace TCGPocketDex.Contracts.Cards;
+
+public record CardOutputDTO(
+    int Id,
+    string Culture,
+    string Name,
+    string? Description,
+    string ImageUrl,
+    int CardRarityId,
+    string CardRarityName,
+    int? BoosterId,
+    string? BoosterName,
+    int? CardExtensionId,
+    string? CardExtensionSeries,
+    string? CardExtensionCode,
+    string? CardExtensionName,
+    int? PromoSeriesId,
+    string? PromoSeriesCode,
+    string? PromoSeriesName,
+    CardKind Kind,
+    int? FossilHp,
+    bool? PokemonIsEx,
+    bool? PokemonIsMega,
+    int? PokemonStageId,
+    int? PokemonHp,
+    int? PokemonTypeId,
+    int? PokemonWeaknessTypeId,
+    int? PokemonRetreatCost,
+    int? PokemonAbilityId,
+    IReadOnlyList<int>? PokemonAttackIds
+);

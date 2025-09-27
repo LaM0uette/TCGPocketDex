@@ -42,6 +42,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<PokemonAttack> PokemonAttacks => Set<PokemonAttack>();
     public DbSet<PokemonAttackTranslation> PokemonAttackTranslations => Set<PokemonAttackTranslation>();
 
+    public DbSet<PokemonStage> PokemonStages => Set<PokemonStage>();
     public DbSet<PokemonStageTranslation> PokemonStageTranslations => Set<PokemonStageTranslation>();
 
     public DbSet<PokemonWeakness> PokemonWeaknesses => Set<PokemonWeakness>();
@@ -80,7 +81,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .IsUnique();
 
         modelBuilder.Entity<PokemonStageTranslation>()
-            .HasIndex(t => new { t.Stage, t.Culture })
+            .HasIndex(t => new { t.PokemonStageId, t.Culture })
             .IsUnique();
 
         modelBuilder.Entity<CardExtensionTranslation>()
