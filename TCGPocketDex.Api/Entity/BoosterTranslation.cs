@@ -14,4 +14,7 @@ public class BoosterTranslation
 
     [MaxLength(100)]
     public required string Name { get; set; }
+
+    [MaxLength(300)]
+    public string? ImageUrl { get; set; }
 }

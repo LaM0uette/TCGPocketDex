@@ -4,5 +4,6 @@ public record CardExtensionInputDTO(
     string Series,
     string Code,
     string Culture,
-    string Name
+    string Name,
+    string? ImageUrl
 );

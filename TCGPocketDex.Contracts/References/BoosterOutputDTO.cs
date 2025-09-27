@@ -3,5 +3,6 @@
 public record BoosterOutputDTO(
     int Id,
     int CardExtensionId,
-    string Name
+    string Name,
+    string? ImageUrl
 );

@@ -482,7 +482,7 @@ else
     private async Task CreateExtension()
     {
         if (string.IsNullOrWhiteSpace(newExtensionSeries) || string.IsNullOrWhiteSpace(newExtensionCode) || string.IsNullOrWhiteSpace(newExtensionName)) return;
-        var dto = new CardExtensionInputDTO(newExtensionSeries, newExtensionCode, culture, newExtensionName);
+        var dto = new CardExtensionInputDTO(newExtensionSeries, newExtensionCode, culture, newExtensionName, null);
         var created = await CardExtensionsClient.CreateAsync(dto);
         if (created != null)
         {
@@ -500,7 +500,7 @@ else
     private async Task CreateBooster()
     {
         if (!edit.CardExtensionId.HasValue || string.IsNullOrWhiteSpace(newBoosterName)) return;
-        var dto = new BoosterInputDTO(edit.CardExtensionId.Value, culture, newBoosterName);
+        var dto = new BoosterInputDTO(edit.CardExtensionId.Value, culture, newBoosterName, null);
         var created = await BoostersClient.CreateAsync(dto);
         if (created != null)
         {

@@ -3,5 +3,6 @@
 public record BoosterInputDTO(
     int CardExtensionId,
     string Culture,
-    string Name
+    string Name,
+    string? ImageUrl
 );

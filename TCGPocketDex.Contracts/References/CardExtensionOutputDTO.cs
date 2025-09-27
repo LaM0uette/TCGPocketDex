@@ -4,5 +4,6 @@ public record CardExtensionOutputDTO(
     int Id,
     string Series,
     string Code,
-    string Name
+    string Name,
+    string? ImageUrl
 );

@@ -17,7 +17,7 @@ public class CardExtensionRepository(ApplicationDbContext db) : ICardExtensionRe
         foreach (var e in list)
         {
             var tr = e.Translations.FirstOrDefault(x => x.Culture == culture) ?? e.Translations.FirstOrDefault();
-            result.Add(new CardExtensionOutputDTO(e.Id, e.Series, e.Code, tr?.Name ?? string.Empty));
+            result.Add(new CardExtensionOutputDTO(e.Id, e.Series, e.Code, tr?.Name ?? string.Empty, tr?.ImageUrl));
         }
         return result;
     }
@@ -33,10 +33,11 @@ public class CardExtensionRepository(ApplicationDbContext db) : ICardExtensionRe
         {
             CardExtension = entity,
             Culture = input.Culture,
-            Name = input.Name
+            Name = input.Name,
+            ImageUrl = input.ImageUrl
         });
         db.CardExtensions.Add(entity);
         await db.SaveChangesAsync(ct);
-        return new CardExtensionOutputDTO(entity.Id, entity.Series, entity.Code, input.Name);
+        return new CardExtensionOutputDTO(entity.Id, entity.Series, entity.Code, input.Name, input.ImageUrl);
     }
 }

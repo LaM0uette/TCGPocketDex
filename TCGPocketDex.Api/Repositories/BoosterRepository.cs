@@ -16,7 +16,7 @@ public class BoosterRepository(ApplicationDbContext db) : IBoosterRepository
         foreach (var b in list)
         {
             var tr = b.Translations.FirstOrDefault(x => x.Culture == culture) ?? b.Translations.FirstOrDefault();
-            result.Add(new BoosterOutputDTO(b.Id, b.CardExtensionId, tr?.Name ?? string.Empty));
+            result.Add(new BoosterOutputDTO(b.Id, b.CardExtensionId, tr?.Name ?? string.Empty, tr?.ImageUrl));
         }
         return result;
     }
@@ -32,10 +32,11 @@ public class BoosterRepository(ApplicationDbContext db) : IBoosterRepository
         {
             Booster = entity,
             Culture = input.Culture,
-            Name = input.Name
+            Name = input.Name,
+            ImageUrl = input.ImageUrl
         });
         db.Boosters.Add(entity);
         await db.SaveChangesAsync(ct);
-        return new BoosterOutputDTO(entity.Id, entity.CardExtensionId, input.Name);
+        return new BoosterOutputDTO(entity.Id, entity.CardExtensionId, input.Name, input.ImageUrl);
     }
 }
