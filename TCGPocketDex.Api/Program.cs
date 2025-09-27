@@ -34,6 +34,21 @@ builder.Services.AddScoped<TCGPocketDex.Api.Services.IPokemonTypeService, TCGPoc
 builder.Services.AddScoped<TCGPocketDex.Api.Repositories.IPokemonStageRepository, TCGPocketDex.Api.Repositories.PokemonStageRepository>();
 builder.Services.AddScoped<TCGPocketDex.Api.Services.IPokemonStageService, TCGPocketDex.Api.Services.PokemonStageService>();
 
+builder.Services.AddScoped<TCGPocketDex.Api.Repositories.IPokemonAbilityRepository, TCGPocketDex.Api.Repositories.PokemonAbilityRepository>();
+builder.Services.AddScoped<TCGPocketDex.Api.Services.IPokemonAbilityService, TCGPocketDex.Api.Services.PokemonAbilityService>();
+
+builder.Services.AddScoped<TCGPocketDex.Api.Repositories.IPokemonAttackRepository, TCGPocketDex.Api.Repositories.PokemonAttackRepository>();
+builder.Services.AddScoped<TCGPocketDex.Api.Services.IPokemonAttackService, TCGPocketDex.Api.Services.PokemonAttackService>();
+
+builder.Services.AddScoped<TCGPocketDex.Api.Repositories.ICardExtensionRepository, TCGPocketDex.Api.Repositories.CardExtensionRepository>();
+builder.Services.AddScoped<TCGPocketDex.Api.Services.ICardExtensionService, TCGPocketDex.Api.Services.CardExtensionService>();
+
+builder.Services.AddScoped<TCGPocketDex.Api.Repositories.IBoosterRepository, TCGPocketDex.Api.Repositories.BoosterRepository>();
+builder.Services.AddScoped<TCGPocketDex.Api.Services.IBoosterService, TCGPocketDex.Api.Services.BoosterService>();
+
+builder.Services.AddScoped<TCGPocketDex.Api.Repositories.ICardRarityRepository, TCGPocketDex.Api.Repositories.CardRarityRepository>();
+builder.Services.AddScoped<TCGPocketDex.Api.Services.ICardRarityService, TCGPocketDex.Api.Services.CardRarityService>();
+
 string connectionString = builder.Configuration.GetConnectionString("Default") ?? throw new InvalidOperationException("ConnectionStrings: Default is not configured in appsettings.json or environment.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -62,5 +77,10 @@ app.UseAuthorization();
 app.MapCards();
 app.MapPokemonTypes();
 app.MapPokemonStages();
+app.MapPokemonAbilities();
+app.MapPokemonAttacks();
+app.MapCardExtensions();
+app.MapBoosters();
+app.MapCardRarities();
 
 app.Run();

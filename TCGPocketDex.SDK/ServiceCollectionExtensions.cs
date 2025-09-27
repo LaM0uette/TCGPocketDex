@@ -22,6 +22,26 @@ public static class ServiceCollectionExtensions
         {
             client.BaseAddress = new Uri(apiBaseUrl);
         });
+        services.AddHttpClient<IAbilitiesClient, AbilitiesClient>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+        });
+        services.AddHttpClient<IAttacksClient, AttacksClient>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+        });
+        services.AddHttpClient<ICardExtensionsClient, CardExtensionsClient>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+        });
+        services.AddHttpClient<IBoostersClient, BoostersClient>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+        });
+        services.AddHttpClient<IRaritiesClient, RaritiesClient>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+        });
         return services;
     }
 }

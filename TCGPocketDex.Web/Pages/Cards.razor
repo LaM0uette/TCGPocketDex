@@ -6,6 +6,11 @@
 @inject ICardsClient CardsClient
 @inject ITypesClient TypesClient
 @inject IStagesClient StagesClient
+@inject IAbilitiesClient AbilitiesClient
+@inject IAttacksClient AttacksClient
+@inject ICardExtensionsClient CardExtensionsClient
+@inject IBoostersClient BoostersClient
+@inject IRaritiesClient RaritiesClient
 
 <h1>Cards</h1>
 
@@ -48,8 +53,25 @@ else
             <label>ImageUrl: <input @bind="edit.ImageUrl" /></label>
         </div>
         <div>
-            <label>Rarity Id: <input type="number" @bind="edit.CardRarityId" /></label>
+            <label>Rarity:
+                <select @bind="edit.CardRarityId">
+                    <option value="">-- select --</option>
+                    @foreach (var r in rarities)
+                    {
+                        <option value="@r.Id">@r.Name</option>
+                    }
+                </select>
+                <button type="button" @onclick="ToggleNewRarity">@((showNewRarity ? "Cancel" : "New Rarity"))</button>
+            </label>
         </div>
+        @if (showNewRarity)
+        {
+            <div>
+                <label>Name: <input @bind="newRarityName" /></label>
+                <label>ImageUrl: <input @bind="newRarityImageUrl" /></label>
+                <button type="button" @onclick="CreateRarity">Create Rarity</button>
+            </div>
+        }
         <div>
             <label>Kind:
                 <select @bind="edit.Kind">
@@ -67,11 +89,45 @@ else
             @if (useBooster)
             {
                 <div>
-                    <label>Booster Id: <input type="number" @bind="edit.BoosterId" /></label>
+                    <label>Extension:
+                        <select @bind="edit.CardExtensionId" @bind:after="OnExtensionChanged">
+                            <option value="">-- select --</option>
+                            @foreach (var e in extensions)
+                            {
+                                <option value="@e.Id">@e.Series - @e.Code - @e.Name</option>
+                            }
+                        </select>
+                        <button type="button" @onclick="ToggleNewExtension">@((showNewExtension ? "Cancel" : "New Extension"))</button>
+                    </label>
                 </div>
+                @if (showNewExtension)
+                {
+                    <div>
+                        <label>Series: <input @bind="newExtensionSeries" /></label>
+                        <label>Code: <input @bind="newExtensionCode" /></label>
+                        <label>Name: <input @bind="newExtensionName" /></label>
+                        <button type="button" @onclick="CreateExtension">Create Extension</button>
+                    </div>
+                }
                 <div>
-                    <label>Extension Id: <input type="number" @bind="edit.CardExtensionId" /></label>
+                    <label>Booster:
+                        <select @bind="edit.BoosterId">
+                            <option value="">-- select --</option>
+                            @foreach (var b in boosters)
+                            {
+                                <option value="@b.Id">@b.Name</option>
+                            }
+                        </select>
+                        <button type="button" @onclick="ToggleNewBooster">@((showNewBooster ? "Cancel" : "New Booster"))</button>
+                    </label>
                 </div>
+                @if (showNewBooster)
+                {
+                    <div>
+                        <label>New Booster Name: <input @bind="newBoosterName" /></label>
+                        <button type="button" @onclick="CreateBooster" disabled="@(!edit.CardExtensionId.HasValue)">Create Booster</button>
+                    </div>
+                }
             }
             else
             {
@@ -152,12 +208,63 @@ else
                 <label>Retreat Cost: <input type="number" @bind="edit.PokemonRetreatCost" /></label>
             </div>
             <div>
-                <label>Ability Id: <input type="number" @bind="edit.PokemonAbilityId" /></label>
+                <label>Ability:
+                    <select @bind="edit.PokemonAbilityId">
+                        <option value="">-- none --</option>
+                        @foreach (var a in abilities)
+                        {
+                            <option value="@a.Id">@a.Name</option>
+                        }
+                    </select>
+                    <button type="button" @onclick="ToggleNewAbility">@((showNewAbility ? "Cancel" : "New Ability"))</button>
+                </label>
+            </div>
+            @if (showNewAbility)
+            {
+                <div>
+                    <label>Name: <input @bind="newAbilityName" /></label>
+                    <button type="button" @onclick="CreateAbility">Create Ability</button>
+                </div>
+            }
+            <div>
+                <label>Add Attack:
+                    <select @bind="selectedAttackToAdd">
+                        <option value="">-- select --</option>
+                        @foreach (var a in attacks)
+                        {
+                            <option value="@a.Id">@a.Name (@a.Damage)</option>
+                        }
+                    </select>
+                    <button type="button" @onclick="AddSelectedAttack" disabled="@(!selectedAttackToAdd.HasValue)">Add</button>
+                </label>
             </div>
             <div>
-                <label>Attack Ids (comma separated): <input @bind="attackIdsRaw" /></label>
-                <button type="button" @onclick="ParseAttacks">Apply</button>
+                <strong>Selected Attacks:</strong>
+                <ul>
+                    @foreach (var id in selectedAttackIds)
+                    {
+                        var a = attacks.FirstOrDefault(x => x.Id == id);
+                        <li>@a?.Name (@a?.Damage) <button type="button" @onclick="() => RemoveAttack(id)">Remove</button></li>
+                    }
+                </ul>
+                <button type="button" @onclick="ToggleNewAttack">@((showNewAttack ? "Cancel" : "New Attack"))</button>
             </div>
+            @if (showNewAttack)
+            {
+                <div>
+                    <label>Name: <input @bind="newAttackName" /></label>
+                    <label>Damage: <input type="number" @bind="newAttackDamage" /></label>
+                    <label>Description: <input @bind="newAttackDescription" /></label>
+                    <div>
+                        <span>Cost Types:</span>
+                        @foreach (var t in types)
+                        {
+                            <label><input type="checkbox" checked="@newAttackCostTypeIds.Contains(t.Id)" @onchange="(ChangeEventArgs e) => ToggleAttackCostType(t.Id, e)" /> @t.Name</label>
+                        }
+                    </div>
+                    <button type="button" @onclick="CreateAttack">Create Attack</button>
+                </div>
+            }
         }
 
         <button type="submit">Create</button>
@@ -174,12 +281,43 @@ else
     private List<PokemonTypeOutputDTO> types = new();
     private List<PokemonStageOutputDTO> stages = new();
 
+    private List<CardRarityOutputDTO> rarities = new();
+    private List<CardExtensionOutputDTO> extensions = new();
+    private List<BoosterOutputDTO> boosters = new();
+    private List<PokemonAbilityOutputDTO> abilities = new();
+    private List<PokemonAttackOutputDTO> attacks = new();
+
     private bool showNewType = false;
     private bool showNewStage = false;
+
+    private bool showNewRarity = false;
+    private bool showNewExtension = false;
+    private bool showNewBooster = false;
+    private bool showNewAbility = false;
+    private bool showNewAttack = false;
 
     private string? newTypeName;
     private string? newTypeImageUrl;
     private string? newStageName;
+
+    private string? newRarityName;
+    private string? newRarityImageUrl;
+
+    private string? newExtensionSeries;
+    private string? newExtensionCode;
+    private string? newExtensionName;
+
+    private string? newBoosterName;
+
+    private string? newAbilityName;
+
+    private string? newAttackName;
+    private string? newAttackDescription;
+    private int newAttackDamage;
+    private HashSet<int> newAttackCostTypeIds = new();
+
+    private HashSet<int> selectedAttackIds = new();
+    private int? selectedAttackToAdd;
 
     private NewCardModel edit = new()
     {
@@ -197,6 +335,11 @@ else
     {
         types = (await TypesClient.GetAllAsync(culture)).ToList();
         stages = (await StagesClient.GetAllAsync(culture)).ToList();
+        rarities = (await RaritiesClient.GetAllAsync()).ToList();
+        extensions = (await CardExtensionsClient.GetAllAsync(culture)).ToList();
+        abilities = (await AbilitiesClient.GetAllAsync(culture)).ToList();
+        attacks = (await AttacksClient.GetAllAsync(culture)).ToList();
+        await LoadBoostersForSelectedExtension();
         cards = (await CardsClient.GetAllAsync(culture)).ToList();
         StateHasChanged();
     }
@@ -270,6 +413,134 @@ else
         }
     }
 
+    private void ToggleNewRarity() => showNewRarity = !showNewRarity;
+    private void ToggleNewExtension() => showNewExtension = !showNewExtension;
+    private void ToggleNewBooster() => showNewBooster = !showNewBooster;
+    private void ToggleNewAbility() => showNewAbility = !showNewAbility;
+    private void ToggleNewAttack() => showNewAttack = !showNewAttack;
+
+    private async Task CreateRarity()
+    {
+        if (string.IsNullOrWhiteSpace(newRarityName) || string.IsNullOrWhiteSpace(newRarityImageUrl)) return;
+        var dto = new CardRarityInputDTO(newRarityName, newRarityImageUrl);
+        var created = await RaritiesClient.CreateAsync(dto);
+        if (created != null)
+        {
+            rarities.Add(created);
+            edit.CardRarityId = created.Id;
+            showNewRarity = false;
+            newRarityName = null;
+            newRarityImageUrl = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnExtensionChanged()
+    {
+        await LoadBoostersForSelectedExtension();
+    }
+
+    private async Task LoadBoostersForSelectedExtension()
+    {
+        if (edit.CardExtensionId.HasValue)
+        {
+            boosters = (await BoostersClient.GetAllAsync(culture, edit.CardExtensionId.Value)).ToList();
+            if (!edit.BoosterId.HasValue || !boosters.Any(b => b.Id == edit.BoosterId.Value)) edit.BoosterId = null;
+        }
+        else
+        {
+            boosters = new List<BoosterOutputDTO>();
+            edit.BoosterId = null;
+        }
+    }
+
+    private async Task CreateExtension()
+    {
+        if (string.IsNullOrWhiteSpace(newExtensionSeries) || string.IsNullOrWhiteSpace(newExtensionCode) || string.IsNullOrWhiteSpace(newExtensionName)) return;
+        var dto = new CardExtensionInputDTO(newExtensionSeries, newExtensionCode, culture, newExtensionName);
+        var created = await CardExtensionsClient.CreateAsync(dto);
+        if (created != null)
+        {
+            extensions.Add(created);
+            edit.CardExtensionId = created.Id;
+            showNewExtension = false;
+            newExtensionSeries = null;
+            newExtensionCode = null;
+            newExtensionName = null;
+            await LoadBoostersForSelectedExtension();
+            StateHasChanged();
+        }
+    }
+
+    private async Task CreateBooster()
+    {
+        if (!edit.CardExtensionId.HasValue || string.IsNullOrWhiteSpace(newBoosterName)) return;
+        var dto = new BoosterInputDTO(edit.CardExtensionId.Value, culture, newBoosterName);
+        var created = await BoostersClient.CreateAsync(dto);
+        if (created != null)
+        {
+            boosters.Add(created);
+            edit.BoosterId = created.Id;
+            showNewBooster = false;
+            newBoosterName = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task CreateAbility()
+    {
+        if (string.IsNullOrWhiteSpace(newAbilityName)) return;
+        var dto = new PokemonAbilityInputDTO(culture, newAbilityName);
+        var created = await AbilitiesClient.CreateAsync(dto);
+        if (created != null)
+        {
+            abilities.Add(created);
+            edit.PokemonAbilityId = created.Id;
+            showNewAbility = false;
+            newAbilityName = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task CreateAttack()
+    {
+        if (string.IsNullOrWhiteSpace(newAttackName)) return;
+        var dto = new PokemonAttackInputDTO(culture, newAttackName, newAttackDescription, newAttackDamage, newAttackCostTypeIds.ToList());
+        var created = await AttacksClient.CreateAsync(dto);
+        if (created != null)
+        {
+            attacks.Add(created);
+            selectedAttackIds.Add(created.Id);
+            showNewAttack = false;
+            newAttackName = null;
+            newAttackDescription = null;
+            newAttackDamage = 0;
+            newAttackCostTypeIds.Clear();
+            StateHasChanged();
+        }
+    }
+
+    private void AddSelectedAttack()
+    {
+        if (selectedAttackToAdd.HasValue)
+        {
+            selectedAttackIds.Add(selectedAttackToAdd.Value);
+            selectedAttackToAdd = null;
+        }
+    }
+
+    private void RemoveAttack(int id)
+    {
+        if (selectedAttackIds.Contains(id)) selectedAttackIds.Remove(id);
+    }
+
+    private void ToggleAttackCostType(int typeId, ChangeEventArgs e)
+    {
+        var isChecked = e.Value is bool b && b;
+        if (isChecked) newAttackCostTypeIds.Add(typeId);
+        else newAttackCostTypeIds.Remove(typeId);
+    }
+
     private async Task Create()
     {
         try
@@ -292,6 +563,7 @@ else
                 edit.CardExtensionId = null;
             }
 
+            edit.PokemonAttackIds = selectedAttackIds.Count > 0 ? selectedAttackIds.ToList() : null;
             var dto = new CardInputDTO(
                 Culture: edit.Culture ?? "fr",
                 Name: edit.Name ?? string.Empty,
