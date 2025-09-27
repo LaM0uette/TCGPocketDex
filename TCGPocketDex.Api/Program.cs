@@ -29,6 +29,10 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<TCGPocketDex.Api.Repositories.ICardRepository, TCGPocketDex.Api.Repositories.CardRepository>();
 builder.Services.AddScoped<TCGPocketDex.Api.Services.ICardService, TCGPocketDex.Api.Services.CardService>();
+builder.Services.AddScoped<TCGPocketDex.Api.Repositories.IPokemonTypeRepository, TCGPocketDex.Api.Repositories.PokemonTypeRepository>();
+builder.Services.AddScoped<TCGPocketDex.Api.Services.IPokemonTypeService, TCGPocketDex.Api.Services.PokemonTypeService>();
+builder.Services.AddScoped<TCGPocketDex.Api.Repositories.IPokemonStageRepository, TCGPocketDex.Api.Repositories.PokemonStageRepository>();
+builder.Services.AddScoped<TCGPocketDex.Api.Services.IPokemonStageService, TCGPocketDex.Api.Services.PokemonStageService>();
 
 string connectionString = builder.Configuration.GetConnectionString("Default") ?? throw new InvalidOperationException("ConnectionStrings: Default is not configured in appsettings.json or environment.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -56,5 +60,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapCards();
+app.MapPokemonTypes();
+app.MapPokemonStages();
 
 app.Run();

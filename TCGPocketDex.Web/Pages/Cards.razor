@@ -1,7 +1,11 @@
 @page "/cards"
 @using TCGPocketDex.SDK.Cards
+@using TCGPocketDex.SDK.References
 @using TCGPocketDex.Contracts.Cards
+@using TCGPocketDex.Contracts.References
 @inject ICardsClient CardsClient
+@inject ITypesClient TypesClient
+@inject IStagesClient StagesClient
 
 <h1>Cards</h1>
 
@@ -92,16 +96,57 @@ else
                 <label>Is Mega: <input type="checkbox" @bind="edit.PokemonIsMega" /></label>
             </div>
             <div>
-                <label>Stage Id: <input type="number" @bind="edit.PokemonStageId" /></label>
+                <label>Stage:
+                    <select @bind="edit.PokemonStageId">
+                        <option value="">-- select --</option>
+                        @foreach (var s in stages)
+                        {
+                            <option value="@s.Id">@s.Name</option>
+                        }
+                    </select>
+                    <button type="button" @onclick="ToggleNewStage">@((showNewStage ? "Cancel" : "New Stage"))</button>
+                </label>
             </div>
+            @if (showNewStage)
+            {
+                <div>
+                    <label>New Stage Name: <input @bind="newStageName" /></label>
+                    <button type="button" @onclick="CreateStage">Create Stage</button>
+                </div>
+            }
             <div>
                 <label>HP: <input type="number" @bind="edit.PokemonHp" /></label>
             </div>
             <div>
-                <label>Type Id: <input type="number" @bind="edit.PokemonTypeId" /></label>
+                <label>Type:
+                    <select @bind="edit.PokemonTypeId">
+                        <option value="">-- select --</option>
+                        @foreach (var t in types)
+                        {
+                            <option value="@t.Id">@t.Name</option>
+                        }
+                    </select>
+                    <button type="button" @onclick="ToggleNewType">@((showNewType ? "Cancel" : "New Type"))</button>
+                </label>
             </div>
+            @if (showNewType)
+            {
+                <div>
+                    <label>New Type Name: <input @bind="newTypeName" /></label>
+                    <label>ImageUrl: <input @bind="newTypeImageUrl" /></label>
+                    <button type="button" @onclick="CreateType">Create Type</button>
+                </div>
+            }
             <div>
-                <label>Weakness Type Id: <input type="number" @bind="edit.PokemonWeaknessTypeId" /></label>
+                <label>Weakness:
+                    <select @bind="edit.PokemonWeaknessTypeId">
+                        <option value="">-- none --</option>
+                        @foreach (var t in types)
+                        {
+                            <option value="@t.Id">@t.Name</option>
+                        }
+                    </select>
+                </label>
             </div>
             <div>
                 <label>Retreat Cost: <input type="number" @bind="edit.PokemonRetreatCost" /></label>
@@ -126,6 +171,16 @@ else
     private bool useBooster = true;
     private string? attackIdsRaw;
 
+    private List<PokemonTypeOutputDTO> types = new();
+    private List<PokemonStageOutputDTO> stages = new();
+
+    private bool showNewType = false;
+    private bool showNewStage = false;
+
+    private string? newTypeName;
+    private string? newTypeImageUrl;
+    private string? newStageName;
+
     private NewCardModel edit = new()
     {
         Culture = "fr",
@@ -140,6 +195,8 @@ else
 
     private async Task Load()
     {
+        types = (await TypesClient.GetAllAsync(culture)).ToList();
+        stages = (await StagesClient.GetAllAsync(culture)).ToList();
         cards = (await CardsClient.GetAllAsync(culture)).ToList();
         StateHasChanged();
     }
@@ -176,6 +233,41 @@ else
             .Select(v => v!.Value)
             .ToList();
         edit.PokemonAttackIds = ids;
+    }
+
+    private void ToggleNewType() => showNewType = !showNewType;
+    private void ToggleNewStage() => showNewStage = !showNewStage;
+
+    private async Task CreateType()
+    {
+        if (string.IsNullOrWhiteSpace(newTypeName) || string.IsNullOrWhiteSpace(newTypeImageUrl)) return;
+        var dto = new PokemonTypeInputDTO(culture, newTypeName, newTypeImageUrl);
+        var created = await TypesClient.CreateAsync(dto);
+        if (created != null)
+        {
+            types.Add(created);
+            edit.PokemonTypeId = created.Id;
+            if (!edit.PokemonWeaknessTypeId.HasValue) edit.PokemonWeaknessTypeId = created.Id;
+            showNewType = false;
+            newTypeName = null;
+            newTypeImageUrl = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task CreateStage()
+    {
+        if (string.IsNullOrWhiteSpace(newStageName)) return;
+        var dto = new PokemonStageInputDTO(culture, newStageName);
+        var created = await StagesClient.CreateAsync(dto);
+        if (created != null)
+        {
+            stages.Add(created);
+            edit.PokemonStageId = created.Id;
+            showNewStage = false;
+            newStageName = null;
+            StateHasChanged();
+        }
     }
 
     private async Task Create()
