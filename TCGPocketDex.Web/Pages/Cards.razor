@@ -1,0 +1,263 @@
+@page "/cards"
+@using TCGPocketDex.SDK.Cards
+@using TCGPocketDex.Contracts.Cards
+@inject ICardsClient CardsClient
+
+<h1>Cards</h1>
+
+<div>
+    <label>Culture: <input @bind="culture" /></label>
+    <button @onclick="Load">Load</button>
+</div>
+
+@if (cards is null)
+{
+    <p>Loading...</p>
+}
+else if (cards.Count == 0)
+{
+    <p>No cards.</p>
+}
+else
+{
+    <ul>
+        @foreach (var c in cards)
+        {
+            <li>@c.Id - @c.Name (@c.Kind) [Rarity: @c.CardRarityName]</li>
+        }
+    </ul>
+}
+
+<hr />
+<button @onclick="ToggleNew">@((showNew ? "Cancel" : "New"))</button>
+@if (showNew)
+{
+    <EditForm Model="edit" OnValidSubmit="Create">
+        <DataAnnotationsValidator />
+        <div>
+            <label>Culture: <input @bind="edit.Culture" /></label>
+        </div>
+        <div>
+            <label>Name: <input @bind="edit.Name" /></label>
+        </div>
+        <div>
+            <label>ImageUrl: <input @bind="edit.ImageUrl" /></label>
+        </div>
+        <div>
+            <label>Rarity Id: <input type="number" @bind="edit.CardRarityId" /></label>
+        </div>
+        <div>
+            <label>Kind:
+                <select @bind="edit.Kind">
+                    @foreach (var k in Enum.GetValues<CardKind>())
+                    {
+                        <option value="@k">@k</option>
+                    }
+                </select>
+            </label>
+        </div>
+        <fieldset>
+            <legend>Origin</legend>
+            <label><input type="radio" name="origin" value="booster" @onchange="_ => SetOrigin(true)" checked="@useBooster" /> Booster</label>
+            <label><input type="radio" name="origin" value="promo" @onchange="_ => SetOrigin(false)" checked="@(!useBooster)" /> Promo</label>
+            @if (useBooster)
+            {
+                <div>
+                    <label>Booster Id: <input type="number" @bind="edit.BoosterId" /></label>
+                </div>
+                <div>
+                    <label>Extension Id: <input type="number" @bind="edit.CardExtensionId" /></label>
+                </div>
+            }
+            else
+            {
+                <div>
+                    <label>Promo Series Id: <input type="number" @bind="edit.PromoSeriesId" /></label>
+                </div>
+            }
+        </fieldset>
+
+        @if (edit.Kind == CardKind.Fossil)
+        {
+            <div>
+                <label>Fossil HP: <input type="number" @bind="edit.FossilHp" /></label>
+            </div>
+        }
+        else if (edit.Kind == CardKind.Pokemon)
+        {
+            <div>
+                <label>Is EX: <input type="checkbox" @bind="edit.PokemonIsEx" /></label>
+            </div>
+            <div>
+                <label>Is Mega: <input type="checkbox" @bind="edit.PokemonIsMega" /></label>
+            </div>
+            <div>
+                <label>Stage Id: <input type="number" @bind="edit.PokemonStageId" /></label>
+            </div>
+            <div>
+                <label>HP: <input type="number" @bind="edit.PokemonHp" /></label>
+            </div>
+            <div>
+                <label>Type Id: <input type="number" @bind="edit.PokemonTypeId" /></label>
+            </div>
+            <div>
+                <label>Weakness Type Id: <input type="number" @bind="edit.PokemonWeaknessTypeId" /></label>
+            </div>
+            <div>
+                <label>Retreat Cost: <input type="number" @bind="edit.PokemonRetreatCost" /></label>
+            </div>
+            <div>
+                <label>Ability Id: <input type="number" @bind="edit.PokemonAbilityId" /></label>
+            </div>
+            <div>
+                <label>Attack Ids (comma separated): <input @bind="attackIdsRaw" /></label>
+                <button type="button" @onclick="ParseAttacks">Apply</button>
+            </div>
+        }
+
+        <button type="submit">Create</button>
+    </EditForm>
+}
+
+@code {
+    private string culture = "fr";
+    private List<CardOutputDTO> cards = new();
+    private bool showNew = false;
+    private bool useBooster = true;
+    private string? attackIdsRaw;
+
+    private NewCardModel edit = new()
+    {
+        Culture = "fr",
+        CardRarityId = 1,
+        Kind = CardKind.Item
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    private async Task Load()
+    {
+        cards = (await CardsClient.GetAllAsync(culture)).ToList();
+        StateHasChanged();
+    }
+
+    private void ToggleNew()
+    {
+        showNew = !showNew;
+    }
+
+    private void SetOrigin(bool booster)
+    {
+        useBooster = booster;
+        if (booster)
+        {
+            edit.PromoSeriesId = null;
+        }
+        else
+        {
+            edit.BoosterId = null;
+            edit.CardExtensionId = null;
+        }
+    }
+
+    private void ParseAttacks()
+    {
+        if (string.IsNullOrWhiteSpace(attackIdsRaw))
+        {
+            edit.PokemonAttackIds = null;
+            return;
+        }
+        var ids = attackIdsRaw.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(s => int.TryParse(s, out var v) ? v : (int?)null)
+            .Where(v => v.HasValue)
+            .Select(v => v!.Value)
+            .ToList();
+        edit.PokemonAttackIds = ids;
+    }
+
+    private async Task Create()
+    {
+        try
+        {
+            if (useBooster)
+            {
+                if (!edit.BoosterId.HasValue || !edit.CardExtensionId.HasValue)
+                {
+                    return;
+                }
+                edit.PromoSeriesId = null;
+            }
+            else
+            {
+                if (!edit.PromoSeriesId.HasValue)
+                {
+                    return;
+                }
+                edit.BoosterId = null;
+                edit.CardExtensionId = null;
+            }
+
+            var dto = new CardInputDTO(
+                Culture: edit.Culture ?? "fr",
+                Name: edit.Name ?? string.Empty,
+                Description: edit.Description,
+                ImageUrl: edit.ImageUrl ?? string.Empty,
+                CardRarityId: edit.CardRarityId,
+                BoosterId: edit.BoosterId,
+                CardExtensionId: edit.CardExtensionId,
+                PromoSeriesId: edit.PromoSeriesId,
+                Kind: edit.Kind,
+                FossilHp: edit.FossilHp,
+                PokemonIsEx: edit.PokemonIsEx,
+                PokemonIsMega: edit.PokemonIsMega,
+                PokemonStageId: edit.PokemonStageId,
+                PokemonHp: edit.PokemonHp,
+                PokemonTypeId: edit.PokemonTypeId,
+                PokemonWeaknessTypeId: edit.PokemonWeaknessTypeId,
+                PokemonRetreatCost: edit.PokemonRetreatCost,
+                PokemonAbilityId: edit.PokemonAbilityId,
+                PokemonAttackIds: edit.PokemonAttackIds
+            );
+
+            var created = await CardsClient.CreateAsync(dto);
+            showNew = false;
+            var cultureTemp = edit.Culture;
+            edit = new NewCardModel
+            {
+                Culture = cultureTemp,
+                CardRarityId = 1,
+                Kind = CardKind.Item
+            };
+            await Load();
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private class NewCardModel
+    {
+        public string? Culture { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public string? ImageUrl { get; set; }
+        public int CardRarityId { get; set; }
+        public int? BoosterId { get; set; }
+        public int? CardExtensionId { get; set; }
+        public int? PromoSeriesId { get; set; }
+        public CardKind Kind { get; set; }
+        public int? FossilHp { get; set; }
+        public bool? PokemonIsEx { get; set; }
+        public bool? PokemonIsMega { get; set; }
+        public int? PokemonStageId { get; set; }
+        public int? PokemonHp { get; set; }
+        public int? PokemonTypeId { get; set; }
+        public int? PokemonWeaknessTypeId { get; set; }
+        public int? PokemonRetreatCost { get; set; }
+        public int? PokemonAbilityId { get; set; }
+        public IReadOnlyList<int>? PokemonAttackIds { get; set; }
+    }
+}
