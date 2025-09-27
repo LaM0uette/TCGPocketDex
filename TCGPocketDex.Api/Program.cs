@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using TCGPocketDex.Api.Data;
 using TCGPocketDex.Api.Endpoints;
+using TCGPocketDex.Api.Repositories;
+using TCGPocketDex.Api.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -27,38 +29,38 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
 
-builder.Services.AddScoped<TCGPocketDex.Api.Repositories.ICardRepository, TCGPocketDex.Api.Repositories.CardRepository>();
-builder.Services.AddScoped<TCGPocketDex.Api.Services.ICardService, TCGPocketDex.Api.Services.CardService>();
-builder.Services.AddScoped<TCGPocketDex.Api.Repositories.IPokemonTypeRepository, TCGPocketDex.Api.Repositories.PokemonTypeRepository>();
-builder.Services.AddScoped<TCGPocketDex.Api.Services.IPokemonTypeService, TCGPocketDex.Api.Services.PokemonTypeService>();
-builder.Services.AddScoped<TCGPocketDex.Api.Repositories.IPokemonStageRepository, TCGPocketDex.Api.Repositories.PokemonStageRepository>();
-builder.Services.AddScoped<TCGPocketDex.Api.Services.IPokemonStageService, TCGPocketDex.Api.Services.PokemonStageService>();
 
-builder.Services.AddScoped<TCGPocketDex.Api.Repositories.IPokemonAbilityRepository, TCGPocketDex.Api.Repositories.PokemonAbilityRepository>();
-builder.Services.AddScoped<TCGPocketDex.Api.Services.IPokemonAbilityService, TCGPocketDex.Api.Services.PokemonAbilityService>();
+builder.Services.AddScoped<ICardRepository, CardRepository>();
+builder.Services.AddScoped<ICardService, CardService>();
+builder.Services.AddScoped<IPokemonTypeRepository, PokemonTypeRepository>();
+builder.Services.AddScoped<IPokemonTypeService, PokemonTypeService>();
+builder.Services.AddScoped<IPokemonStageRepository, PokemonStageRepository>();
+builder.Services.AddScoped<IPokemonStageService, PokemonStageService>();
 
-builder.Services.AddScoped<TCGPocketDex.Api.Repositories.IPokemonAttackRepository, TCGPocketDex.Api.Repositories.PokemonAttackRepository>();
-builder.Services.AddScoped<TCGPocketDex.Api.Services.IPokemonAttackService, TCGPocketDex.Api.Services.PokemonAttackService>();
+builder.Services.AddScoped<IPokemonAbilityRepository, PokemonAbilityRepository>();
+builder.Services.AddScoped<IPokemonAbilityService, PokemonAbilityService>();
 
-builder.Services.AddScoped<TCGPocketDex.Api.Repositories.ICardExtensionRepository, TCGPocketDex.Api.Repositories.CardExtensionRepository>();
-builder.Services.AddScoped<TCGPocketDex.Api.Services.ICardExtensionService, TCGPocketDex.Api.Services.CardExtensionService>();
+builder.Services.AddScoped<IPokemonAttackRepository, PokemonAttackRepository>();
+builder.Services.AddScoped<IPokemonAttackService, PokemonAttackService>();
 
-builder.Services.AddScoped<TCGPocketDex.Api.Repositories.IBoosterRepository, TCGPocketDex.Api.Repositories.BoosterRepository>();
-builder.Services.AddScoped<TCGPocketDex.Api.Services.IBoosterService, TCGPocketDex.Api.Services.BoosterService>();
+builder.Services.AddScoped<ICardExtensionRepository, CardExtensionRepository>();
+builder.Services.AddScoped<ICardExtensionService, CardExtensionService>();
 
-builder.Services.AddScoped<TCGPocketDex.Api.Repositories.ICardRarityRepository, TCGPocketDex.Api.Repositories.CardRarityRepository>();
-builder.Services.AddScoped<TCGPocketDex.Api.Services.ICardRarityService, TCGPocketDex.Api.Services.CardRarityService>();
+builder.Services.AddScoped<IBoosterRepository, BoosterRepository>();
+builder.Services.AddScoped<IBoosterService, BoosterService>();
 
-builder.Services.AddScoped<TCGPocketDex.Api.Repositories.IPromoSeriesRepository, TCGPocketDex.Api.Repositories.PromoSeriesRepository>();
-builder.Services.AddScoped<TCGPocketDex.Api.Services.IPromoSeriesService, TCGPocketDex.Api.Services.PromoSeriesService>();
+builder.Services.AddScoped<ICardRarityRepository, CardRarityRepository>();
+builder.Services.AddScoped<ICardRarityService, CardRarityService>();
+
+builder.Services.AddScoped<IPromoSeriesRepository, PromoSeriesRepository>();
+builder.Services.AddScoped<IPromoSeriesService, PromoSeriesService>();
+
 
 string connectionString = builder.Configuration.GetConnectionString("Default") ?? throw new InvalidOperationException("ConnectionStrings: Default is not configured in appsettings.json or environment.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseNpgsql(connectionString);
 });
-
-
 
 WebApplication app = builder.Build();
 
@@ -76,6 +78,7 @@ app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseStaticFiles();
 
 app.MapCards();
 app.MapPokemonTypes();

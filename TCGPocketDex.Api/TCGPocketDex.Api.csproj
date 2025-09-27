@@ -21,4 +21,9 @@
     <ProjectReference Include="..\TCGPocketDex.Contracts\TCGPocketDex.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\img\cards\" />
+    <Folder Include="wwwroot\img\pokemonType\" />
+  </ItemGroup>
+
 </Project>
