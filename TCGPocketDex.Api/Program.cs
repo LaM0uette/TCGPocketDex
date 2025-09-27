@@ -20,10 +20,8 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add services to the container.
 builder.Services.AddAuthorization();
 
-// Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
@@ -34,19 +32,23 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString);
 });
 
-// Repositories
-//builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-// Services
-//builder.Services.AddScoped<IUserService, UserService>();
 
 WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
+app.UseCors("AppPolicy");
+
+// Redirect root to Swagger UI so it's opened by default
+app.MapGet("/", () => Results.Redirect("/swagger"));
+
 app.UseHttpsRedirection();
+app.UseAuthorization();
 
 app.Run();
