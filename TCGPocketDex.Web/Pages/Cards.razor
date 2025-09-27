@@ -11,6 +11,7 @@
 @inject ICardExtensionsClient CardExtensionsClient
 @inject IBoostersClient BoostersClient
 @inject IRaritiesClient RaritiesClient
+@inject IPromoSeriesClient PromoSeriesClient
 
 <h1>Cards</h1>
 
@@ -132,8 +133,25 @@ else
             else
             {
                 <div>
-                    <label>Promo Series Id: <input type="number" @bind="edit.PromoSeriesId" /></label>
+                    <label>Promo Series:
+                        <select @bind="edit.PromoSeriesId">
+                            <option value="">-- select --</option>
+                            @foreach (var p in promoSeries)
+                            {
+                                <option value="@p.Id">@p.Code - @p.Name</option>
+                            }
+                        </select>
+                        <button type="button" @onclick="ToggleNewPromoSeries">@((showNewPromoSeries ? "Cancel" : "New Promo Series"))</button>
+                    </label>
                 </div>
+                @if (showNewPromoSeries)
+                {
+                    <div>
+                        <label>Code: <input @bind="newPromoSeriesCode" /></label>
+                        <label>Name: <input @bind="newPromoSeriesName" /></label>
+                        <button type="button" @onclick="CreatePromoSeries">Create Promo Series</button>
+                    </div>
+                }
             }
         </fieldset>
 
@@ -286,6 +304,7 @@ else
     private List<BoosterOutputDTO> boosters = new();
     private List<PokemonAbilityOutputDTO> abilities = new();
     private List<PokemonAttackOutputDTO> attacks = new();
+    private List<PromoSeriesOutputDTO> promoSeries = new();
 
     private bool showNewType = false;
     private bool showNewStage = false;
@@ -295,6 +314,7 @@ else
     private bool showNewBooster = false;
     private bool showNewAbility = false;
     private bool showNewAttack = false;
+    private bool showNewPromoSeries = false;
 
     private string? newTypeName;
     private string? newTypeImageUrl;
@@ -310,6 +330,9 @@ else
     private string? newBoosterName;
 
     private string? newAbilityName;
+
+    private string? newPromoSeriesCode;
+    private string? newPromoSeriesName;
 
     private string? newAttackName;
     private string? newAttackDescription;
@@ -339,6 +362,7 @@ else
         extensions = (await CardExtensionsClient.GetAllAsync(culture)).ToList();
         abilities = (await AbilitiesClient.GetAllAsync(culture)).ToList();
         attacks = (await AttacksClient.GetAllAsync(culture)).ToList();
+        promoSeries = (await PromoSeriesClient.GetAllAsync(culture)).ToList();
         await LoadBoostersForSelectedExtension();
         cards = (await CardsClient.GetAllAsync(culture)).ToList();
         StateHasChanged();
@@ -418,6 +442,7 @@ else
     private void ToggleNewBooster() => showNewBooster = !showNewBooster;
     private void ToggleNewAbility() => showNewAbility = !showNewAbility;
     private void ToggleNewAttack() => showNewAttack = !showNewAttack;
+    private void ToggleNewPromoSeries() => showNewPromoSeries = !showNewPromoSeries;
 
     private async Task CreateRarity()
     {
@@ -498,6 +523,22 @@ else
             edit.PokemonAbilityId = created.Id;
             showNewAbility = false;
             newAbilityName = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task CreatePromoSeries()
+    {
+        if (string.IsNullOrWhiteSpace(newPromoSeriesCode) || string.IsNullOrWhiteSpace(newPromoSeriesName)) return;
+        var dto = new PromoSeriesInputDTO(newPromoSeriesCode!, culture, newPromoSeriesName!);
+        var created = await PromoSeriesClient.CreateAsync(dto);
+        if (created != null)
+        {
+            promoSeries.Add(created);
+            edit.PromoSeriesId = created.Id;
+            showNewPromoSeries = false;
+            newPromoSeriesCode = null;
+            newPromoSeriesName = null;
             StateHasChanged();
         }
     }

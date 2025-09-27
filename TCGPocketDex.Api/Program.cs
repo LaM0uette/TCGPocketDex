@@ -49,6 +49,9 @@ builder.Services.AddScoped<TCGPocketDex.Api.Services.IBoosterService, TCGPocketD
 builder.Services.AddScoped<TCGPocketDex.Api.Repositories.ICardRarityRepository, TCGPocketDex.Api.Repositories.CardRarityRepository>();
 builder.Services.AddScoped<TCGPocketDex.Api.Services.ICardRarityService, TCGPocketDex.Api.Services.CardRarityService>();
 
+builder.Services.AddScoped<TCGPocketDex.Api.Repositories.IPromoSeriesRepository, TCGPocketDex.Api.Repositories.PromoSeriesRepository>();
+builder.Services.AddScoped<TCGPocketDex.Api.Services.IPromoSeriesService, TCGPocketDex.Api.Services.PromoSeriesService>();
+
 string connectionString = builder.Configuration.GetConnectionString("Default") ?? throw new InvalidOperationException("ConnectionStrings: Default is not configured in appsettings.json or environment.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -82,5 +85,6 @@ app.MapPokemonAttacks();
 app.MapCardExtensions();
 app.MapBoosters();
 app.MapCardRarities();
+app.MapPromoSeries();
 
 app.Run();

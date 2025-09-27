@@ -42,6 +42,10 @@ public static class ServiceCollectionExtensions
         {
             client.BaseAddress = new Uri(apiBaseUrl);
         });
+        services.AddHttpClient<IPromoSeriesClient, PromoSeriesClient>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+        });
         return services;
     }
 }
