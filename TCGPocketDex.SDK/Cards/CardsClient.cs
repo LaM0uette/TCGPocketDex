@@ -39,4 +39,12 @@ public class CardsClient(HttpClient http) : ICardsClient
         var resp = await http.DeleteAsync($"cards/{id}", ct);
         return resp.IsSuccessStatusCode;
     }
+
+    public async Task<CardOutputDTO?> AddTranslationAsync(int id, CardTranslationInputDTO input, CancellationToken ct = default)
+    {
+        var resp = await http.PostAsJsonAsync($"cards/{id}/translations", input, ct);
+        if (!resp.IsSuccessStatusCode) return null;
+        var updated = await resp.Content.ReadFromJsonAsync<CardOutputDTO>(cancellationToken: ct);
+        return updated;
+    }
 }

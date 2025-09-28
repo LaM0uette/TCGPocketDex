@@ -231,6 +231,60 @@ public class CardRepository(ApplicationDbContext db) : ICardRepository
         return true;
     }
 
+    public async Task<CardOutputDTO?> AddTranslationAsync(int id, CardTranslationInputDTO input, CancellationToken ct)
+    {
+        var card = await db.Cards
+            .Include(x => x.Translations)
+            .FirstOrDefaultAsync(x => x.Id == id, ct);
+        if (card == null) return null;
+
+        // Find existing translation for same culture
+        var existing = card.Translations.FirstOrDefault(t => t.Culture == input.Culture);
+        // Decide ImageUrl: use provided or copy from EN or first available
+        string imageUrl = !string.IsNullOrWhiteSpace(input.ImageUrl)
+            ? input.ImageUrl!
+            : (card.Translations.FirstOrDefault(t => t.Culture == "en")?.ImageUrl
+               ?? card.Translations.FirstOrDefault()?.ImageUrl
+               ?? string.Empty);
+
+        if (existing == null)
+        {
+            var tr = new CardTranslation
+            {
+                Card = card,
+                Culture = input.Culture,
+                Name = input.Name,
+                Description = input.Description,
+                ImageUrl = imageUrl
+            };
+            db.CardTranslations.Add(tr);
+        }
+        else
+        {
+            existing.Name = input.Name;
+            existing.Description = input.Description;
+            existing.ImageUrl = imageUrl;
+        }
+
+        await db.SaveChangesAsync(ct);
+
+        // Return card in requested culture
+        var loaded = await db.Cards
+            .AsNoTracking()
+            .Include(x => x.Rarity)
+            .Include(x => x.Translations)
+            .Include(x => x.Booster)!.ThenInclude(b => b!.Translations)
+            .Include(x => x.Extension)!.ThenInclude(e => e!.Translations)
+            .Include(x => x.PromoSeries)!.ThenInclude(p => p!.Translations)
+            .FirstAsync(x => x.Id == id, ct);
+        if (loaded is PokemonCard pcLoaded)
+        {
+            await db.Entry(pcLoaded).Reference(x => x.Weakness).LoadAsync(ct);
+            await db.Entry(pcLoaded).Collection(x => x.Attacks).LoadAsync(ct);
+        }
+        return ToOutput(loaded, input.Culture);
+    }
+
     static void ValidateOrigin(CardInputDTO input)
     {
         var hasBooster = input.BoosterId.HasValue && input.CardExtensionId.HasValue;

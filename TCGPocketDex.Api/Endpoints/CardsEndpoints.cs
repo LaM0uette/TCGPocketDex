@@ -30,6 +30,12 @@ public static class CardsEndpoints
             return Results.Created($"/cards/{created.Id}", created);
         });
 
+        group.MapPost("/{id:int}/translations", async (ICardService svc, int id, CardTranslationInputDTO input, CancellationToken ct) =>
+        {
+            var updated = await svc.AddTranslationAsync(id, input, ct);
+            return updated == null ? Results.NotFound() : Results.Ok(updated);
+        });
+
         group.MapPut("/{id:int}", async (ICardService svc, int id, CardInputDTO input, CancellationToken ct) =>
         {
             var updated = await svc.UpdateAsync(id, input, ct);

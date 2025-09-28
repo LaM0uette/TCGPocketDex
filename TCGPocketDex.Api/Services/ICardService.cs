@@ -9,4 +9,5 @@ public interface ICardService
     Task<CardOutputDTO> CreateAsync(CardInputDTO input, CancellationToken ct);
     Task<CardOutputDTO?> UpdateAsync(int id, CardInputDTO input, CancellationToken ct);
     Task<bool> DeleteAsync(int id, CancellationToken ct);
+    Task<CardOutputDTO?> AddTranslationAsync(int id, CardTranslationInputDTO input, CancellationToken ct);
 }

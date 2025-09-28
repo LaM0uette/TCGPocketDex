@@ -52,6 +52,9 @@ else
             <div>
                 <label>Description (EN): <textarea @bind="edit.DescriptionEn"></textarea></label>
             </div>
+            <div>
+                <label>Name (FR): <input @bind="edit.NameFr" /></label>
+            </div>
         </fieldset>
         <div>
             <label>ImageUrl: <input @bind="edit.ImageUrl" /></label>
@@ -552,7 +555,19 @@ else
                 PokemonAbilityId: edit.PokemonAbilityId,
                 PokemonAttackIds: edit.PokemonAttackIds
             );
-            await CardsClient.CreateAsync(dtoEn);
+            var createdEn = await CardsClient.CreateAsync(dtoEn);
+
+            // Add FR translation (server copies EN ImageUrl if not provided)
+            if (!string.IsNullOrWhiteSpace(edit.NameFr))
+            {
+                var dtoFr = new CardTranslationInputDTO(
+                    Culture: "fr",
+                    Name: edit.NameFr ?? string.Empty,
+                    Description: null,
+                    ImageUrl: null
+                );
+                await CardsClient.AddTranslationAsync(createdEn.Id, dtoFr);
+            }
 
             // Keep the form open for mass creation; just reload the list
             await Load();
@@ -568,7 +583,6 @@ else
         public string? NameEn { get; set; }
         public string? DescriptionEn { get; set; }
         public string? NameFr { get; set; }
-        public string? DescriptionFr { get; set; }
 
         // Shared fields
         public string? ImageUrl { get; set; }
