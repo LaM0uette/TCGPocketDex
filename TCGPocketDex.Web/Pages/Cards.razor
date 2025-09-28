@@ -33,7 +33,7 @@ else
     <ul>
         @foreach (var row in cardsDisplay)
         {
-            <li>@row.Id - EN: @row.NameEn | FR: @row.NameFr | ImageUrl: @row.ImageUrl</li>
+            <li>@row.Id - EN: @row.NameEn | FR: @row.NameFr | ImageUrl: @row.ImageUrl   <img src="@row.ImageUrl" alt="img" style="width:10px; height:auto; border:1px solid #ccc;" /></li>
         }
     </ul>
 }
@@ -606,6 +606,8 @@ else
 
             // Keep the form open for mass creation; just reload the list
             await Load();
+            edit.ExtensionCardNumber++;
+            StateHasChanged();
         }
         catch (Exception)
         {
