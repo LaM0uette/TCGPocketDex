@@ -93,8 +93,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .IsUnique();
 
         modelBuilder.Entity<Booster>()
-            .HasIndex(b => new { b.CardExtensionId })
-            .IsUnique();
+            .HasIndex(b => b.CardExtensionId)
+            .IsUnique(false);
 
         modelBuilder.Entity<BoosterTranslation>()
             .HasIndex(t => new { t.BoosterId, t.Culture })
