@@ -44,12 +44,15 @@ else
 {
     <EditForm Model="edit" OnValidSubmit="Create">
         <DataAnnotationsValidator />
-        <div>
-            <label>Culture: <input @bind="edit.Culture" /></label>
-        </div>
-        <div>
-            <label>Name: <input @bind="edit.Name" /></label>
-        </div>
+        <fieldset>
+            <legend>Localizations</legend>
+            <div>
+                <label>Name (EN): <input @bind="edit.NameEn" /></label>
+            </div>
+            <div>
+                <label>Description (EN): <textarea @bind="edit.DescriptionEn"></textarea></label>
+            </div>
+        </fieldset>
         <div>
             <label>ImageUrl: <input @bind="edit.ImageUrl" /></label>
         </div>
@@ -62,17 +65,8 @@ else
                         <option value="@r.Id">@r.Name</option>
                     }
                 </select>
-                <button type="button" @onclick="ToggleNewRarity">@((showNewRarity ? "Cancel" : "New Rarity"))</button>
             </label>
         </div>
-        @if (showNewRarity)
-        {
-            <div>
-                <label>Name: <input @bind="newRarityName" /></label>
-                <label>ImageUrl: <input @bind="newRarityImageUrl" /></label>
-                <button type="button" @onclick="CreateRarity">Create Rarity</button>
-            </div>
-        }
         <div>
             <label>Kind:
                 <select @bind="edit.Kind">
@@ -98,18 +92,8 @@ else
                                 <option value="@e.Id">@e.Series - @e.Code - @e.Name</option>
                             }
                         </select>
-                        <button type="button" @onclick="ToggleNewExtension">@((showNewExtension ? "Cancel" : "New Extension"))</button>
                     </label>
                 </div>
-                @if (showNewExtension)
-                {
-                    <div>
-                        <label>Series: <input @bind="newExtensionSeries" /></label>
-                        <label>Code: <input @bind="newExtensionCode" /></label>
-                        <label>Name: <input @bind="newExtensionName" /></label>
-                        <button type="button" @onclick="CreateExtension">Create Extension</button>
-                    </div>
-                }
                 <div>
                     <label>Booster:
                         <select @bind="edit.BoosterId">
@@ -119,16 +103,8 @@ else
                                 <option value="@b.Id">@b.Name</option>
                             }
                         </select>
-                        <button type="button" @onclick="ToggleNewBooster">@((showNewBooster ? "Cancel" : "New Booster"))</button>
                     </label>
                 </div>
-                @if (showNewBooster)
-                {
-                    <div>
-                        <label>New Booster Name: <input @bind="newBoosterName" /></label>
-                        <button type="button" @onclick="CreateBooster" disabled="@(!edit.CardExtensionId.HasValue)">Create Booster</button>
-                    </div>
-                }
             }
             else
             {
@@ -141,17 +117,8 @@ else
                                 <option value="@p.Id">@p.Code - @p.Name</option>
                             }
                         </select>
-                        <button type="button" @onclick="ToggleNewPromoSeries">@((showNewPromoSeries ? "Cancel" : "New Promo Series"))</button>
                     </label>
                 </div>
-                @if (showNewPromoSeries)
-                {
-                    <div>
-                        <label>Code: <input @bind="newPromoSeriesCode" /></label>
-                        <label>Name: <input @bind="newPromoSeriesName" /></label>
-                        <button type="button" @onclick="CreatePromoSeries">Create Promo Series</button>
-                    </div>
-                }
             }
         </fieldset>
 
@@ -178,16 +145,8 @@ else
                             <option value="@s.Id">@s.Name</option>
                         }
                     </select>
-                    <button type="button" @onclick="ToggleNewStage">@((showNewStage ? "Cancel" : "New Stage"))</button>
                 </label>
             </div>
-            @if (showNewStage)
-            {
-                <div>
-                    <label>New Stage Name: <input @bind="newStageName" /></label>
-                    <button type="button" @onclick="CreateStage">Create Stage</button>
-                </div>
-            }
             <div>
                 <label>HP: <input type="number" @bind="edit.PokemonHp" /></label>
             </div>
@@ -200,17 +159,8 @@ else
                             <option value="@t.Id">@t.Name</option>
                         }
                     </select>
-                    <button type="button" @onclick="ToggleNewType">@((showNewType ? "Cancel" : "New Type"))</button>
                 </label>
             </div>
-            @if (showNewType)
-            {
-                <div>
-                    <label>New Type Name: <input @bind="newTypeName" /></label>
-                    <label>ImageUrl: <input @bind="newTypeImageUrl" /></label>
-                    <button type="button" @onclick="CreateType">Create Type</button>
-                </div>
-            }
             <div>
                 <label>Weakness:
                     <select @bind="edit.PokemonWeaknessTypeId">
@@ -234,16 +184,8 @@ else
                             <option value="@a.Id">@a.Name</option>
                         }
                     </select>
-                    <button type="button" @onclick="ToggleNewAbility">@((showNewAbility ? "Cancel" : "New Ability"))</button>
                 </label>
             </div>
-            @if (showNewAbility)
-            {
-                <div>
-                    <label>Name: <input @bind="newAbilityName" /></label>
-                    <button type="button" @onclick="CreateAbility">Create Ability</button>
-                </div>
-            }
             <div>
                 <label>Add Attack:
                     <select @bind="selectedAttackToAdd">
@@ -265,24 +207,7 @@ else
                         <li>@a?.Name (@a?.Damage) <button type="button" @onclick="() => RemoveAttack(id)">Remove</button></li>
                     }
                 </ul>
-                <button type="button" @onclick="ToggleNewAttack">@((showNewAttack ? "Cancel" : "New Attack"))</button>
             </div>
-            @if (showNewAttack)
-            {
-                <div>
-                    <label>Name: <input @bind="newAttackName" /></label>
-                    <label>Damage: <input type="number" @bind="newAttackDamage" /></label>
-                    <label>Description: <input @bind="newAttackDescription" /></label>
-                    <div>
-                        <span>Cost Types:</span>
-                        @foreach (var t in types)
-                        {
-                            <label><input type="checkbox" checked="@newAttackCostTypeIds.Contains(t.Id)" @onchange="(ChangeEventArgs e) => ToggleAttackCostType(t.Id, e)" /> @t.Name</label>
-                        }
-                    </div>
-                    <button type="button" @onclick="CreateAttack">Create Attack</button>
-                </div>
-            }
         }
 
         <button type="submit">Create</button>
@@ -344,7 +269,6 @@ else
 
     private NewCardModel edit = new()
     {
-        Culture = "fr",
         CardRarityId = 1,
         Kind = CardKind.Item
     };
@@ -605,10 +529,12 @@ else
             }
 
             edit.PokemonAttackIds = selectedAttackIds.Count > 0 ? selectedAttackIds.ToList() : null;
-            var dto = new CardInputDTO(
-                Culture: edit.Culture ?? "fr",
-                Name: edit.Name ?? string.Empty,
-                Description: edit.Description,
+
+            // Create EN first
+            var dtoEn = new CardInputDTO(
+                Culture: "en",
+                Name: edit.NameEn ?? string.Empty,
+                Description: edit.DescriptionEn,
                 ImageUrl: edit.ImageUrl ?? string.Empty,
                 CardRarityId: edit.CardRarityId,
                 BoosterId: edit.BoosterId,
@@ -626,16 +552,9 @@ else
                 PokemonAbilityId: edit.PokemonAbilityId,
                 PokemonAttackIds: edit.PokemonAttackIds
             );
+            await CardsClient.CreateAsync(dtoEn);
 
-            var created = await CardsClient.CreateAsync(dto);
-            showNew = false;
-            var cultureTemp = edit.Culture;
-            edit = new NewCardModel
-            {
-                Culture = cultureTemp,
-                CardRarityId = 1,
-                Kind = CardKind.Item
-            };
+            // Keep the form open for mass creation; just reload the list
             await Load();
         }
         catch (Exception)
@@ -645,9 +564,13 @@ else
 
     private class NewCardModel
     {
-        public string? Culture { get; set; }
-        public string? Name { get; set; }
-        public string? Description { get; set; }
+        // Localizations
+        public string? NameEn { get; set; }
+        public string? DescriptionEn { get; set; }
+        public string? NameFr { get; set; }
+        public string? DescriptionFr { get; set; }
+
+        // Shared fields
         public string? ImageUrl { get; set; }
         public int CardRarityId { get; set; }
         public int? BoosterId { get; set; }
