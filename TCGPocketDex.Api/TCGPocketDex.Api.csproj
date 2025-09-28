@@ -22,8 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\img\boosters\" />
+    <Folder Include="wwwroot\img\cardExtensions\" />
     <Folder Include="wwwroot\img\cards\" />
-    <Folder Include="wwwroot\img\pokemonType\" />
+    <Folder Include="wwwroot\img\pokemonTypes\" />
   </ItemGroup>
 
 </Project>
