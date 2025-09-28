@@ -11,7 +11,7 @@ public static class ImagesEndpoints
     {
         var group = app.MapGroup("/images");
 
-        // GET /img/cards/{name}
+        // GET /images/cards/{name}
         group.MapGet("/cards/{name}", (IWebHostEnvironment env, string name) =>
         {
             // Basic sanitization: allow only letters, numbers, dash and underscore
@@ -21,16 +21,16 @@ public static class ImagesEndpoints
             }
 
             var webRoot = env.WebRootPath;
-            var filePath = Path.Combine(webRoot, "img", "cards", name + ".png");
+            var filePath = Path.Combine(webRoot, "img", "cards", name + ".webp");
             if (!File.Exists(filePath))
             {
                 return Results.NotFound();
             }
 
-            return Results.File(filePath, contentType: "image/png");
+            return Results.File(filePath, contentType: "image/webp");
         });
 
-        // GET /img/cards -> list of image base names (without extension)
+        // GET /images/cards -> list of image base names (without extension)
         group.MapGet("/cards", (IWebHostEnvironment env) =>
         {
             var dir = Path.Combine(env.WebRootPath, "img", "cards");
@@ -39,7 +39,7 @@ public static class ImagesEndpoints
                 return Results.Ok(Array.Empty<string>());
             }
 
-            var names = Directory.GetFiles(dir, "*.png")
+            var names = Directory.GetFiles(dir, "*.webp")
                 .Select(Path.GetFileNameWithoutExtension)
                 .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
                 .ToArray();

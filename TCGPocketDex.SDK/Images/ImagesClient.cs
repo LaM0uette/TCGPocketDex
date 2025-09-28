@@ -13,5 +13,5 @@ public class ImagesClient(HttpClient http) : IImagesClient
         => await _http.GetFromJsonAsync<string[]>("images/cards", ct) ?? [];
 
     public string GetCardImageUrl(string name)
-        => new Uri(_http.BaseAddress!, $"img/cards/{name}.png").ToString();
+        => new Uri(_http.BaseAddress!, $"img/cards/{name}.webp").ToString();
 }
