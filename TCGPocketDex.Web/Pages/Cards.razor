@@ -20,7 +20,7 @@
     <button @onclick="Load">Load</button>
 </div>
 
-@if (cardsDisplay is null)
+@*@if (cardsDisplay is null)
 {
     <p>Loading...</p>
 }
@@ -31,12 +31,12 @@ else if (cardsDisplay.Count == 0)
 else
 {
     <ul>
-        @foreach (var row in cardsDisplay)
+        @foreach (var row in cardsDisplay.TakeLast(30).ToList())
         {
-            <li>@row.Id - EN: @row.NameEn | FR: @row.NameFr | ImageUrl: @row.ImageUrl   <img src="@row.ImageUrl" alt="img" style="width:10px; height:auto; border:1px solid #ccc;" /></li>
+            <li>@row.Id - EN: @row.NameEn | FR: @row.NameFr | ImageUrl: @row.ImageUrl   $1$<img src="@row.ImageUrl" alt="img" style="width:10px; height:auto; border:1px solid #ccc;" />#1#</li>
         }
     </ul>
-}
+}*@
 
 <hr />
 <button @onclick="ToggleNew">@((showNew ? "Cancel" : "New"))</button>
@@ -49,27 +49,27 @@ else
             <div>
                 <label>Name (EN): <input @bind="edit.NameEn" /></label>
             </div>
-            <div>
-                <label>Description (EN): <textarea @bind="edit.DescriptionEn"></textarea></label>
-            </div>
+            @* <div> *@
+            @*     <label>Description (EN): <textarea @bind="edit.DescriptionEn"></textarea></label> *@
+            @* </div> *@
             <div>
                 <label>Name (FR): <input @bind="edit.NameFr" /></label>
             </div>
         </fieldset>
-        <div>
-            <label>ImageUrl: <input @bind="edit.ImageUrl" /></label>
-        </div>
-        <div>
-            <label>Rarity:
-                <select @bind="edit.CardRarityId">
-                    <option value="">-- select --</option>
-                    @foreach (var r in rarities)
-                    {
-                        <option value="@r.Id">@r.Name</option>
-                    }
-                </select>
-            </label>
-        </div>
+        @* <div> *@
+        @*     <label>ImageUrl: <input @bind="edit.ImageUrl" /></label> *@
+        @* </div> *@
+        @* <div> *@
+        @*     <label>Rarity: *@
+        @*         <select @bind="edit.CardRarityId"> *@
+        @*             <option value="">-- select --</option> *@
+        @*             @foreach (var r in rarities) *@
+        @*             { *@
+        @*                 <option value="@r.Id">@r.Name</option> *@
+        @*             } *@
+        @*         </select> *@
+        @*     </label> *@
+        @* </div> *@
         <div>
             <label>Kind:
                 <select @bind="edit.Kind">
@@ -139,10 +139,10 @@ else
             <div>
                 <label>Is EX: <input type="checkbox" @bind="edit.PokemonIsEx" /></label>
             </div>
-            <div>
+            @*<div>
                 <label>Is Mega: <input type="checkbox" @bind="edit.PokemonIsMega" /></label>
-            </div>
-            <div>
+            </div>*@
+            @*<div>
                 <label>Stage:
                     <select @bind="edit.PokemonStageId">
                         <option value="">-- select --</option>
@@ -152,10 +152,10 @@ else
                         }
                     </select>
                 </label>
-            </div>
-            <div>
+            </div>*@
+            @*<div>
                 <label>HP: <input type="number" @bind="edit.PokemonHp" /></label>
-            </div>
+            </div>*@
             <div>
                 <label>Type:
                     <select @bind="edit.PokemonTypeId">
@@ -178,10 +178,10 @@ else
                     </select>
                 </label>
             </div>
-            <div>
+            @*<div>
                 <label>Retreat Cost: <input type="number" @bind="edit.PokemonRetreatCost" /></label>
-            </div>
-            <div>
+            </div>*@
+            @*<div>
                 <label>Ability:
                     <select @bind="edit.PokemonAbilityId">
                         <option value="">-- none --</option>
@@ -213,7 +213,7 @@ else
                         <li>@a?.Name (@a?.Damage) <button type="button" @onclick="() => RemoveAttack(id)">Remove</button></li>
                     }
                 </ul>
-            </div>
+            </div>*@
         }
 
         <button type="submit">Create</button>
@@ -222,28 +222,28 @@ else
 
 @code {
     private string culture = "fr";
-    private List<CardOutputDTO> cards = new();
-    private List<CardListRow> cardsDisplay = new();
+    //private List<CardOutputDTO> cards = new();
+    //private List<CardListRow> cardsDisplay = new();
 
-    private sealed class CardListRow
+    /*private sealed class CardListRow
     {
         public int Id { get; set; }
         public string? NameEn { get; set; }
         public string? NameFr { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
-    }
+    }*/
     private bool showNew = false;
     private bool useBooster = true;
     private string? attackIdsRaw;
 
     private List<PokemonTypeOutputDTO> types = new();
-    private List<PokemonStageOutputDTO> stages = new();
+    // private List<PokemonStageOutputDTO> stages = new();
 
-    private List<CardRarityOutputDTO> rarities = new();
+    // private List<CardRarityOutputDTO> rarities = new();
     private List<CardExtensionOutputDTO> extensions = new();
     private List<BoosterOutputDTO> boosters = new();
-    private List<PokemonAbilityOutputDTO> abilities = new();
-    private List<PokemonAttackOutputDTO> attacks = new();
+    // private List<PokemonAbilityOutputDTO> abilities = new();
+    // private List<PokemonAttackOutputDTO> attacks = new();
     private List<PromoSeriesOutputDTO> promoSeries = new();
 
     private bool showNewType = false;
@@ -296,16 +296,16 @@ else
     private async Task Load()
     {
         types = (await TypesClient.GetAllAsync(culture)).ToList();
-        stages = (await StagesClient.GetAllAsync(culture)).ToList();
-        rarities = (await RaritiesClient.GetAllAsync()).ToList();
+        // stages = (await StagesClient.GetAllAsync(culture)).ToList();
+        // rarities = (await RaritiesClient.GetAllAsync()).ToList();
         extensions = (await CardExtensionsClient.GetAllAsync(culture)).ToList();
-        abilities = (await AbilitiesClient.GetAllAsync(culture)).ToList();
-        attacks = (await AttacksClient.GetAllAsync(culture)).ToList();
+        // abilities = (await AbilitiesClient.GetAllAsync(culture)).ToList();
+        // attacks = (await AttacksClient.GetAllAsync(culture)).ToList();
         promoSeries = (await PromoSeriesClient.GetAllAsync(culture)).ToList();
         await LoadBoostersForSelectedExtension();
 
         // Load cards for EN and FR to display both names and image URL
-        var listEn = (await CardsClient.GetAllAsync("en")).ToList();
+        /*var listEn = (await CardsClient.GetAllAsync("en")).ToList();
         var listFr = (await CardsClient.GetAllAsync("fr")).ToList();
         var dictEn = listEn.ToDictionary(x => x.Id, x => x);
         var dictFr = listFr.ToDictionary(x => x.Id, x => x);
@@ -322,10 +322,10 @@ else
                 NameFr = fr?.Name,
                 ImageUrl = en?.ImageUrl ?? fr?.ImageUrl ?? string.Empty
             });
-        }
+        }*/
 
         // Keep culture-specific list if needed elsewhere
-        cards = (await CardsClient.GetAllAsync(culture)).ToList();
+        //cards = (await CardsClient.GetAllAsync(culture)).ToList();
         StateHasChanged();
     }
 
@@ -348,6 +348,8 @@ else
         }
     }
 
+    
+    /*
     private void ParseAttacks()
     {
         if (string.IsNullOrWhiteSpace(attackIdsRaw))
@@ -420,7 +422,9 @@ else
             StateHasChanged();
         }
     }
+    */
 
+    
     private async Task OnExtensionChanged()
     {
         await LoadBoostersForSelectedExtension();
@@ -440,6 +444,8 @@ else
         }
     }
 
+    
+    /*
     private async Task CreateExtension()
     {
         if (string.IsNullOrWhiteSpace(newExtensionSeries) || string.IsNullOrWhiteSpace(newExtensionCode) || string.IsNullOrWhiteSpace(newExtensionName)) return;
@@ -542,7 +548,9 @@ else
         if (isChecked) newAttackCostTypeIds.Add(typeId);
         else newAttackCostTypeIds.Remove(typeId);
     }
+    */
 
+    
     private async Task Create()
     {
         try
@@ -566,6 +574,13 @@ else
             }
 
             edit.PokemonAttackIds = selectedAttackIds.Count > 0 ? selectedAttackIds.ToList() : null;
+            
+            edit.DescriptionEn = string.Empty;
+            edit.ImageUrl = string.Empty;
+            edit.CardRarityId = 1;
+            edit.PokemonStageId = 1;
+            edit.DescriptionEn = string.Empty;
+            edit.DescriptionEn = string.Empty;
 
             // Create EN first
             var dtoEn = new CardInputDTO(
@@ -598,8 +613,8 @@ else
                 var dtoFr = new CardTranslationInputDTO(
                     Culture: "fr",
                     Name: edit.NameFr ?? string.Empty,
-                    Description: null,
-                    ImageUrl: null
+                    Description: string.Empty,
+                    ImageUrl: string.Empty
                 );
                 await CardsClient.AddTranslationAsync(createdEn.Id, dtoFr);
             }
