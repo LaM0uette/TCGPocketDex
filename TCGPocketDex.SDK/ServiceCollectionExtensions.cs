@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TCGPocketDex.SDK.Cards;
 using TCGPocketDex.SDK.References;
+using TCGPocketDex.SDK.Images;
 
 namespace TCGPocketDex.SDK;
 
@@ -43,6 +44,10 @@ public static class ServiceCollectionExtensions
             client.BaseAddress = new Uri(apiBaseUrl);
         });
         services.AddHttpClient<IPromoSeriesClient, PromoSeriesClient>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+        });
+        services.AddHttpClient<IImagesClient, ImagesClient>(client =>
         {
             client.BaseAddress = new Uri(apiBaseUrl);
         });

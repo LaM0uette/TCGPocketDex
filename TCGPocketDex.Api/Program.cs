@@ -96,5 +96,6 @@ app.MapCardExtensions();
 app.MapBoosters();
 app.MapCardRarities();
 app.MapPromoSeries();
+app.MapImages();
 
 app.Run();

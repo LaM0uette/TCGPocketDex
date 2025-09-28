@@ -1,0 +1,35 @@
+﻿@page "/card-images"
+@using TCGPocketDex.SDK.Images
+@inject IImagesClient ImagesClient
+
+<h1>Card Images</h1>
+
+@if (names is null)
+{
+    <p>Loading...</p>
+}
+else if (names.Length == 0)
+{
+    <p>No images found.</p>
+}
+else
+{
+    <div style="display:flex; flex-wrap:wrap; gap:12px;">
+        @foreach (var n in names)
+        {
+            <div style="width:200px; text-align:center;">
+                <img src="@ImagesClient.GetCardImageUrl(n)" alt="@n" style="width:100%; height:auto; border:1px solid #ccc;" />
+                <div style="font-size:12px; margin-top:4px;">@n</div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private string[]? names;
+
+    protected override async Task OnInitializedAsync()
+    {
+        names = await ImagesClient.GetCardImageNamesAsync();
+    }
+}
