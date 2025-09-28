@@ -14,6 +14,7 @@ public record CardOutputDTO(
     string? CardExtensionSeries,
     string? CardExtensionCode,
     string? CardExtensionName,
+    int? ExtensionCardNumber,
     int? PromoSeriesId,
     string? PromoSeriesCode,
     string? PromoSeriesName,

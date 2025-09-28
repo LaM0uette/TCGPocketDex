@@ -124,6 +124,9 @@ else
                 </div>
             }
         </fieldset>
+        <div>
+            <label>ExtensionCardNumber: <input type="number" @bind="edit.ExtensionCardNumber" /></label>
+        </div>
 
         @if (edit.Kind == CardKind.Fossil)
         {
@@ -573,6 +576,7 @@ else
                 CardRarityId: edit.CardRarityId,
                 BoosterId: edit.BoosterId,
                 CardExtensionId: edit.CardExtensionId,
+                ExtensionCardNumber: edit.ExtensionCardNumber,
                 PromoSeriesId: edit.PromoSeriesId,
                 Kind: edit.Kind,
                 FossilHp: edit.FossilHp,
@@ -620,6 +624,7 @@ else
         public int CardRarityId { get; set; }
         public int? BoosterId { get; set; }
         public int? CardExtensionId { get; set; }
+        public int? ExtensionCardNumber { get; set; }
         public int? PromoSeriesId { get; set; }
         public CardKind Kind { get; set; }
         public int? FossilHp { get; set; }

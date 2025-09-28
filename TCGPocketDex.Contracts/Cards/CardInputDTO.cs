@@ -8,6 +8,7 @@ public record CardInputDTO(
     int CardRarityId,
     int? BoosterId,
     int? CardExtensionId,
+    int? ExtensionCardNumber,
     int? PromoSeriesId,
     CardKind Kind,
     int? FossilHp,

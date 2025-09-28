@@ -17,4 +17,6 @@ public class Card
 
     public int? CardExtensionId { get; set; }
     public CardExtension? Extension { get; set; }
+
+    public int? ExtensionCardNumber { get; set; }
 }

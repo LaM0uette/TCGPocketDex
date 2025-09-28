@@ -78,6 +78,7 @@ public class CardRepository(ApplicationDbContext db) : ICardRepository
         card.CardRarityId = input.CardRarityId;
         card.BoosterId = input.BoosterId;
         card.CardExtensionId = input.CardExtensionId;
+        card.ExtensionCardNumber = input.ExtensionCardNumber;
         card.PromoSeriesId = input.PromoSeriesId;
         card.Rarity = null!;
         card.Translations.Add(new CardTranslation
@@ -144,6 +145,7 @@ public class CardRepository(ApplicationDbContext db) : ICardRepository
         card.CardRarityId = input.CardRarityId;
         card.BoosterId = input.BoosterId;
         card.CardExtensionId = input.CardExtensionId;
+        card.ExtensionCardNumber = input.ExtensionCardNumber;
         card.PromoSeriesId = input.PromoSeriesId;
 
         if (card is FossilCard fc)
@@ -351,6 +353,7 @@ public class CardRepository(ApplicationDbContext db) : ICardRepository
             c.Extension?.Series,
             c.Extension?.Code,
             extTr?.Name,
+            c.ExtensionCardNumber,
             c.PromoSeriesId,
             c.PromoSeries?.Code,
             promoName,
