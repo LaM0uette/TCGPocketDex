@@ -20,20 +20,20 @@
     <button @onclick="Load">Load</button>
 </div>
 
-@if (cards is null)
+@if (cardsDisplay is null)
 {
     <p>Loading...</p>
 }
-else if (cards.Count == 0)
+else if (cardsDisplay.Count == 0)
 {
     <p>No cards.</p>
 }
 else
 {
     <ul>
-        @foreach (var c in cards)
+        @foreach (var row in cardsDisplay)
         {
-            <li>@c.Id - @c.Name (@c.Kind) [Rarity: @c.CardRarityName]</li>
+            <li>@row.Id - EN: @row.NameEn | FR: @row.NameFr | ImageUrl: @row.ImageUrl</li>
         }
     </ul>
 }
@@ -220,6 +220,15 @@ else
 @code {
     private string culture = "fr";
     private List<CardOutputDTO> cards = new();
+    private List<CardListRow> cardsDisplay = new();
+
+    private sealed class CardListRow
+    {
+        public int Id { get; set; }
+        public string? NameEn { get; set; }
+        public string? NameFr { get; set; }
+        public string ImageUrl { get; set; } = string.Empty;
+    }
     private bool showNew = false;
     private bool useBooster = true;
     private string? attackIdsRaw;
@@ -291,6 +300,28 @@ else
         attacks = (await AttacksClient.GetAllAsync(culture)).ToList();
         promoSeries = (await PromoSeriesClient.GetAllAsync(culture)).ToList();
         await LoadBoostersForSelectedExtension();
+
+        // Load cards for EN and FR to display both names and image URL
+        var listEn = (await CardsClient.GetAllAsync("en")).ToList();
+        var listFr = (await CardsClient.GetAllAsync("fr")).ToList();
+        var dictEn = listEn.ToDictionary(x => x.Id, x => x);
+        var dictFr = listFr.ToDictionary(x => x.Id, x => x);
+        var allIds = dictEn.Keys.Union(dictFr.Keys).OrderBy(id => id);
+        cardsDisplay = new List<CardListRow>();
+        foreach (var id in allIds)
+        {
+            dictEn.TryGetValue(id, out var en);
+            dictFr.TryGetValue(id, out var fr);
+            cardsDisplay.Add(new CardListRow
+            {
+                Id = id,
+                NameEn = en?.Name,
+                NameFr = fr?.Name,
+                ImageUrl = en?.ImageUrl ?? fr?.ImageUrl ?? string.Empty
+            });
+        }
+
+        // Keep culture-specific list if needed elsewhere
         cards = (await CardsClient.GetAllAsync(culture)).ToList();
         StateHasChanged();
     }
