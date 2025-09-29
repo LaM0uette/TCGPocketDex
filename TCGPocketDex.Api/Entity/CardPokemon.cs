@@ -5,8 +5,7 @@ public class CardPokemon
     public int CardId { get; set; }
     public required Card Card { get; set; }
 
-    public bool IsEX { get; set; }
-    public bool IsMega { get; set; }
+    public PokemonSpecial Specials { get; set; } = PokemonSpecial.None;
 
     public int StageId { get; set; }
     public required PokemonStage Stage { get; set; }
