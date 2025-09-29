@@ -345,7 +345,7 @@ public class CardRepository(ApplicationDbContext db) : ICardRepository
             tr?.Name ?? string.Empty,
             tr?.Description,
             //tr?.ImageUrl ?? string.Empty,
-            $"https://localhost:7093/img/cards/{c.Extension?.Code}-{c.ExtensionCardNumber}.webp",
+            $"https://localhost:7093/img/cards/{c.Extension?.Code}-{c.ExtensionCardNumber}.webp", // mettre le code promo si non null
             c.CardRarityId,
             c.Rarity.Name,
             c.BoosterId,
