@@ -1,7 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCGPocketDex.Api.Old", "TCGPocketDex.Api.Old\TCGPocketDex.Api.Old.csproj", "{F40119F3-F361-4629-A008-C090A99339CB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCGPocketDex.SDK", "TCGPocketDex.SDK\TCGPocketDex.SDK.csproj", "{86D5DEF3-E517-4B55-A62F-37A29340E296}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCGPocketDex.Contracts", "TCGPocketDex.Contracts\TCGPocketDex.Contracts.csproj", "{CC6D6B4E-2749-49FB-BD77-42B50A6802E3}"
@@ -16,10 +14,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F40119F3-F361-4629-A008-C090A99339CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F40119F3-F361-4629-A008-C090A99339CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F40119F3-F361-4629-A008-C090A99339CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F40119F3-F361-4629-A008-C090A99339CB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{86D5DEF3-E517-4B55-A62F-37A29340E296}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{86D5DEF3-E517-4B55-A62F-37A29340E296}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86D5DEF3-E517-4B55-A62F-37A29340E296}.Release|Any CPU.ActiveCfg = Release|Any CPU
