@@ -25,7 +25,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<CardItem> CardItems => Set<CardItem>();
     public DbSet<CardTool> CardTools => Set<CardTool>();
 
-    public DbSet<PokemonStage> PokemonStages => Set<PokemonStage>();
     public DbSet<PokemonType> PokemonTypes => Set<PokemonType>();
     public DbSet<PokemonTypeTranslation> PokemonTypeTranslations => Set<PokemonTypeTranslation>();
     public DbSet<PokemonAbility> PokemonAbilities => Set<PokemonAbility>();
@@ -113,11 +112,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .OnDelete(DeleteBehavior.Cascade);
 
         // CardPokemon relationships
-        modelBuilder.Entity<CardPokemon>()
-            .HasOne(p => p.Stage)
-            .WithMany()
-            .HasForeignKey(p => p.StageId)
-            .OnDelete(DeleteBehavior.Restrict);
+        // Stage is now an enum; no relationship configuration needed
 
         modelBuilder.Entity<CardPokemon>()
             .HasOne(p => p.Type)

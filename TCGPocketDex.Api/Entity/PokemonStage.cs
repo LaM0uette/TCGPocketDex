@@ -1,11 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace TCGPocketDex.Api.Entity;
 
-namespace TCGPocketDex.Api.Entity;
-
-public class PokemonStage
+public enum PokemonStage
 {
-    public int Id { get; init; }
-
-    [MaxLength(30)]
-    public required string Name { get; set; }
+    Basic,
+    Stage1,
+    Stage2
 }

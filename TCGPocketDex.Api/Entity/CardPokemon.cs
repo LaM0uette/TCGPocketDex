@@ -7,8 +7,7 @@ public class CardPokemon
 
     public PokemonSpecial Specials { get; set; } = PokemonSpecial.None;
 
-    public int StageId { get; set; }
-    public required PokemonStage Stage { get; set; }
+    public PokemonStage Stage { get; set; }
 
     public int Hp { get; set; }
 
