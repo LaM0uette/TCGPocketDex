@@ -274,6 +274,32 @@ public class CardService(ICardRepository repo) : ICardService
         };
     }
 
+    public async Task<CardTranslationOutputDTO> AddCardTranslationAsync(int cardId, CardTranslationInputDTO dto, CancellationToken ct = default)
+    {
+        var card = await repo.FindCardAsync(cardId, ct) ?? throw new ArgumentException($"CardId {cardId} not found");
+
+        var translation = new CardTranslation
+        {
+            Card = card,
+            CardId = card.Id,
+            Culture = dto.Culture,
+            Name = dto.Name,
+            Description = dto.Description,
+        };
+
+        await repo.AddCardTranslationAsync(translation, ct);
+        await repo.SaveChangesAsync(ct);
+
+        return new CardTranslationOutputDTO
+        {
+            Id = translation.Id,
+            CardId = card.Id,
+            Culture = translation.Culture,
+            Name = translation.Name,
+            Description = translation.Description,
+        };
+    }
+
     private static CardPokemonOutputDTO MapPokemon(Card card, CardPokemon pokemon)
     {
         return new CardPokemonOutputDTO

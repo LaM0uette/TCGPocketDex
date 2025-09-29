@@ -42,10 +42,17 @@ public class CardRepository(ApplicationDbContext db) : ICardRepository
         return supporter;
     }
 
+    public async Task<CardTranslation> AddCardTranslationAsync(CardTranslation translation, CancellationToken ct = default)
+    {
+        await db.CardTranslations.AddAsync(translation, ct);
+        return translation;
+    }
+
     public Task SaveChangesAsync(CancellationToken ct = default) => db.SaveChangesAsync(ct);
 
     public Task<PokemonType?> FindPokemonTypeAsync(int id, CancellationToken ct = default) => db.PokemonTypes.FirstOrDefaultAsync(t => t.Id == id, ct);
     public Task<PokemonAbility?> FindPokemonAbilityAsync(int id, CancellationToken ct = default) => db.PokemonAbilities.FirstOrDefaultAsync(a => a.Id == id, ct);
     public Task<CardRarity?> FindRarityAsync(int id, CancellationToken ct = default) => db.CardRarities.FirstOrDefaultAsync(r => r.Id == id, ct);
     public Task<CardSet?> FindSetAsync(int id, CancellationToken ct = default) => db.CardSets.FirstOrDefaultAsync(s => s.Id == id, ct);
+    public Task<Card?> FindCardAsync(int id, CancellationToken ct = default) => db.Cards.FirstOrDefaultAsync(c => c.Id == id, ct);
 }
