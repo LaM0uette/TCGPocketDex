@@ -16,7 +16,6 @@ public class Card
     
     public bool IsPromo { get; set; }
     
-    
     public int CardRarityId { get; set; }
     public required CardRarity Rarity { get; set; }
 
