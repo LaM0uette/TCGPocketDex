@@ -14,18 +14,27 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.5" />
     </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TCGPocketDex.Contracts\TCGPocketDex.Contracts.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\img\boosters\" />
-    <Folder Include="wwwroot\img\cardExtensions\" />
-    <Folder Include="wwwroot\img\cards\" />
-    <Folder Include="wwwroot\img\pokemonTypes\" />
-  </ItemGroup>
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\celestial-guardians-lunala.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\celestial-guardians-solgaleo.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\deluxe-pack.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\eevee-grove.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\extradimensional-crisis.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\genetic-apex-charizard.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\genetic-apex-mewtwo.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\genetic-apex-pikachu.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\mystical-island.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\promo-a.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\secluded-springs.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\shining-revelry.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\space-time-smackdown-dialga.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\space-time-smackdown-palkia.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\triumphant-light.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\wisdom-of-sea-and-sky-ho-oh.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\img\boosters\wisdom-of-sea-and-sky-lugia.png" />
+    </ItemGroup>
 
 </Project>
