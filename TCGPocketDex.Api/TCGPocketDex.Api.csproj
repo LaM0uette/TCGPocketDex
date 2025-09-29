@@ -37,4 +37,8 @@
       <_ContentIncludedByDefault Remove="wwwroot\img\boosters\wisdom-of-sea-and-sky-lugia.png" />
     </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TCGPocketDex.Contracts\TCGPocketDex.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

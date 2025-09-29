@@ -22,6 +22,10 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddAuthorization();
 
+// DI registrations
+builder.Services.AddScoped<TCGPocketDex.Api.Repositories.ICardRepository, TCGPocketDex.Api.Repositories.CardRepository>();
+builder.Services.AddScoped<TCGPocketDex.Api.Services.ICardService, TCGPocketDex.Api.Services.CardService>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
@@ -49,5 +53,8 @@ app.MapGet("/", () => Results.Redirect("/swagger"));
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseStaticFiles();
+
+// Endpoints for creating cards (moved to dedicated file)
+TCGPocketDex.Api.Endpoints.CardsEndpoints.MapCardEndpoints(app);
 
 app.Run();

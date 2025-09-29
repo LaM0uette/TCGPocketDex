@@ -1,0 +1,51 @@
+﻿using Microsoft.EntityFrameworkCore;
+using TCGPocketDex.Api.Data;
+using TCGPocketDex.Api.Entity;
+
+namespace TCGPocketDex.Api.Repositories;
+
+public class CardRepository(ApplicationDbContext db) : ICardRepository
+{
+    public async Task<Card> AddCardAsync(Card card, CancellationToken ct = default)
+    {
+        await db.Cards.AddAsync(card, ct);
+        return card;
+    }
+
+    public async Task<CardPokemon> AddPokemonAsync(CardPokemon pokemon, CancellationToken ct = default)
+    {
+        await db.CardPokemons.AddAsync(pokemon, ct);
+        return pokemon;
+    }
+
+    public async Task<CardFossil> AddFossilAsync(CardFossil fossil, CancellationToken ct = default)
+    {
+        await db.CardFossils.AddAsync(fossil, ct);
+        return fossil;
+    }
+
+    public async Task<CardTool> AddToolAsync(CardTool tool, CancellationToken ct = default)
+    {
+        await db.CardTools.AddAsync(tool, ct);
+        return tool;
+    }
+
+    public async Task<CardItem> AddItemAsync(CardItem item, CancellationToken ct = default)
+    {
+        await db.CardItems.AddAsync(item, ct);
+        return item;
+    }
+
+    public async Task<CardSupporter> AddSupporterAsync(CardSupporter supporter, CancellationToken ct = default)
+    {
+        await db.CardSupporters.AddAsync(supporter, ct);
+        return supporter;
+    }
+
+    public Task SaveChangesAsync(CancellationToken ct = default) => db.SaveChangesAsync(ct);
+
+    public Task<PokemonType?> FindPokemonTypeAsync(int id, CancellationToken ct = default) => db.PokemonTypes.FirstOrDefaultAsync(t => t.Id == id, ct);
+    public Task<PokemonAbility?> FindPokemonAbilityAsync(int id, CancellationToken ct = default) => db.PokemonAbilities.FirstOrDefaultAsync(a => a.Id == id, ct);
+    public Task<CardRarity?> FindRarityAsync(int id, CancellationToken ct = default) => db.CardRarities.FirstOrDefaultAsync(r => r.Id == id, ct);
+    public Task<CardSet?> FindSetAsync(int id, CancellationToken ct = default) => db.CardSets.FirstOrDefaultAsync(s => s.Id == id, ct);
+}
