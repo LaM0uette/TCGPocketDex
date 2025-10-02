@@ -14,7 +14,7 @@ public class Card
     [MaxLength(4000)]
     public string? Description { get; set; }
     
-    public bool IsPromo { get; set; }
+    public CardSpecial Specials { get; set; } = CardSpecial.None;
     
     public int CardRarityId { get; set; }
     public required CardRarity Rarity { get; set; }
