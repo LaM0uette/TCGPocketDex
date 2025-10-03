@@ -39,6 +39,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TCGPocketDex.Contracts\TCGPocketDex.Contracts.csproj" />
+    <ProjectReference Include="..\TCGPocketDex.Domain\TCGPocketDex.Domain.csproj" />
   </ItemGroup>
 
 </Project>

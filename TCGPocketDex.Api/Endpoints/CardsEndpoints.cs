@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TCGPocketDex.Api.Data;
-using TCGPocketDex.Api.Entity;
+using TCGPocketDex.Api.Entities;
+using TCGPocketDex.Api.Mappings;
 using TCGPocketDex.Api.Services;
 using TCGPocketDex.Contracts.DTO;
 
@@ -102,13 +103,19 @@ public static class CardsEndpoints
     private static async Task<IResult> GetAllCardsAsync(ApplicationDbContext db, CancellationToken ct)
     {
         List<Card> cards = await db.Cards.AsNoTracking().ToListAsync(ct);
-        return Results.Ok(cards);
+        List<CardOutputDTO> dtos = cards.Select(c => c.ToOutputDTO()).ToList();
+        
+        return Results.Ok(dtos);
     }
 
     private static async Task<IResult> GetCardByIdAsync(int id, ApplicationDbContext db, CancellationToken ct)
     {
         Card? card = await db.Cards.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id, ct);
-        return card is not null ? Results.Ok(card) : Results.NotFound();
+        if (card is null)
+            return Results.NotFound();
+        
+        CardOutputDTO dto = card.ToOutputDTO();
+        return Results.Ok(dto);
     }
     
     #endregion

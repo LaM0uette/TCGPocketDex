@@ -1,4 +1,4 @@
-﻿using TCGPocketDex.Api.Entity;
+﻿using TCGPocketDex.Api.Entities;
 
 namespace TCGPocketDex.Api.Repositories;
 
@@ -16,6 +16,13 @@ public interface ICardRepository
     Task<PokemonType?> FindPokemonTypeAsync(int id, CancellationToken ct = default);
     Task<PokemonAbility?> FindPokemonAbilityAsync(int id, CancellationToken ct = default);
     Task<CardRarity?> FindRarityAsync(int id, CancellationToken ct = default);
-    Task<CardSet?> FindSetAsync(int id, CancellationToken ct = default);
+    Task<CardCollection?> FindSetAsync(int id, CancellationToken ct = default);
     Task<Card?> FindCardAsync(int id, CancellationToken ct = default);
+
+    Task<CardType?> FindCardTypeAsync(int id, CancellationToken ct = default);
+    Task<List<CardSpecial>> FindCardSpecialsByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default);
+    Task<List<PokemonSpecial>> FindPokemonSpecialsByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default);
+
+    Task<CardSpecial?> FindCardSpecialByNameAsync(string name, CancellationToken ct = default);
+    Task<CardType?> FindCardTypeByNameAsync(string name, CancellationToken ct = default);
 }

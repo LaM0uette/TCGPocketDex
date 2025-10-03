@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TCGPocketDex.Api.Entity;
+﻿using TCGPocketDex.Api.Entities;
 using TCGPocketDex.Api.Repositories;
 using TCGPocketDex.Contracts.DTO;
 
@@ -13,21 +12,18 @@ public class CardService(ICardRepository repo) : ICardService
         CardRarity? rarity = await repo.FindRarityAsync(dto.CardRarityId, ct);
         if (rarity is null) throw new ArgumentException($"CardRarityId {dto.CardRarityId} not found");
 
-        CardSet? set = null;
-        if (dto.CardSetId is not null)
-        {
-            set = await repo.FindSetAsync(dto.CardSetId.Value, ct);
-            if (set is null) throw new ArgumentException($"CardSetId {dto.CardSetId} not found");
-        }
+        CardCollection? set = await repo.FindSetAsync(dto.CardCollectionId, ct);
+        if (set is null) 
+            throw new ArgumentException($"CardSetId {dto.CardCollectionId} not found");
 
-        PokemonType? type = await repo.FindPokemonTypeAsync(dto.TypeId, ct);
-        if (type is null) throw new ArgumentException($"TypeId {dto.TypeId} not found");
+        PokemonType? type = await repo.FindPokemonTypeAsync(dto.PokemonTypeId, ct);
+        if (type is null) throw new ArgumentException($"TypeId {dto.PokemonTypeId} not found");
 
         PokemonType? weakness = null;
-        if (dto.WeaknessTypeId is not null)
+        if (dto.WeaknessPokemonTypeId is not null)
         {
-            weakness = await repo.FindPokemonTypeAsync(dto.WeaknessTypeId.Value, ct);
-            if (weakness is null) throw new ArgumentException($"WeaknessTypeId {dto.WeaknessTypeId} not found");
+            weakness = await repo.FindPokemonTypeAsync(dto.WeaknessPokemonTypeId.Value, ct);
+            if (weakness is null) throw new ArgumentException($"WeaknessTypeId {dto.WeaknessPokemonTypeId} not found");
         }
 
         PokemonAbility? ability = null;
@@ -37,35 +33,48 @@ public class CardService(ICardRepository repo) : ICardService
             if (ability is null) throw new ArgumentException($"PokemonAbilityId {dto.PokemonAbilityId} not found");
         }
 
+        var pokemonTypeEntity = await repo.FindCardTypeByNameAsync("Pokemon", ct) ?? throw new ArgumentException("CardType 'Pokemon' not found");
+
         var card = new Card
         {
-            Kind = CardKind.Pokemon,
+            CardTypeId = pokemonTypeEntity.Id,
+            Type = pokemonTypeEntity,
             Name = dto.Name,
-            Description = dto.Description,
-            Specials = dto.IsPromo ? CardSpecial.Promo : CardSpecial.None,
+            Description = dto.Description ?? string.Empty,
             CardRarityId = dto.CardRarityId,
             Rarity = rarity,
-            CardSetId = dto.CardSetId,
-            CardSet = set,
-            SerieNumber = dto.SerieNumber,
+            CardCollectionId = dto.CardCollectionId,
+            Collection = set,
+            CollectionNumber = dto.CollectionNumber,
         };
+
+        // Card specials
+        if (dto.CardSpecialIds?.Count > 0)
+        {
+            card.Specials = await repo.FindCardSpecialsByIdsAsync(dto.CardSpecialIds, ct);
+        }
 
         await repo.AddCardAsync(card, ct);
 
         var pokemon = new CardPokemon
         {
             Card = card,
-            Specials = (PokemonSpecial)dto.PokemonSpecials,
-            Stage = (PokemonStage)dto.Stage,
+            PokemonStageId = dto.PokemonStageId,
             Hp = dto.Hp,
-            TypeId = dto.TypeId,
+            PokemonTypeId = dto.PokemonTypeId,
             Type = type,
-            WeaknessTypeId = dto.WeaknessTypeId,
+            WeaknessPokemonTypeId = dto.WeaknessPokemonTypeId,
             Weakness = weakness,
             RetreatCost = dto.RetreatCost,
             PokemonAbilityId = dto.PokemonAbilityId,
             Ability = ability,
         };
+
+        // Pokemon specials
+        if (dto.PokemonSpecialIds?.Count > 0)
+        {
+            pokemon.Specials = await repo.FindPokemonSpecialsByIdsAsync(dto.PokemonSpecialIds, ct);
+        }
 
         // Map attacks
         if (dto.Attacks?.Count > 0)
@@ -106,25 +115,28 @@ public class CardService(ICardRepository repo) : ICardService
         CardRarity? rarity = await repo.FindRarityAsync(dto.CardRarityId, ct);
         if (rarity is null) throw new ArgumentException($"CardRarityId {dto.CardRarityId} not found");
 
-        CardSet? set = null;
-        if (dto.CardSetId is not null)
-        {
-            set = await repo.FindSetAsync(dto.CardSetId.Value, ct);
-            if (set is null) throw new ArgumentException($"CardSetId {dto.CardSetId} not found");
-        }
+        CardCollection? set = await repo.FindSetAsync(dto.CardCollectionId, ct);
+        if (set is null) 
+            throw new ArgumentException($"CardSetId {dto.CardCollectionId} not found");
+
+        var fossilType = await repo.FindCardTypeByNameAsync("Fossil", ct) ?? throw new ArgumentException("CardType 'Fossil' not found");
 
         var card = new Card
         {
-            Kind = CardKind.Fossil,
+            CardTypeId = fossilType.Id,
+            Type = fossilType,
             Name = dto.Name,
-            Description = dto.Description,
-            Specials = dto.IsPromo ? CardSpecial.Promo : CardSpecial.None,
+            Description = dto.Description ?? string.Empty,
             CardRarityId = dto.CardRarityId,
             Rarity = rarity,
-            CardSetId = dto.CardSetId,
-            CardSet = set,
-            SerieNumber = dto.SerieNumber,
+            CardCollectionId = dto.CardCollectionId,
+            Collection = set,
+            CollectionNumber = dto.CollectionNumber,
         };
+        if (dto.CardSpecialIds?.Count > 0)
+        {
+            card.Specials = await repo.FindCardSpecialsByIdsAsync(dto.CardSpecialIds, ct);
+        }
         await repo.AddCardAsync(card, ct);
 
         var fossil = new CardFossil
@@ -140,10 +152,10 @@ public class CardService(ICardRepository repo) : ICardService
             Id = card.Id,
             Name = card.Name,
             Description = card.Description,
-            IsPromo = (card.Specials & CardSpecial.Promo) != 0,
+            CardSpecialIds = card.Specials.Select(s => s.Id).ToList(),
             CardRarityId = card.CardRarityId,
-            CardSetId = card.CardSetId,
-            SerieNumber = card.SerieNumber,
+            CardSetId = card.CardCollectionId,
+            SerieNumber = card.CollectionNumber,
             Hp = fossil.Hp
         };
     }
@@ -153,25 +165,28 @@ public class CardService(ICardRepository repo) : ICardService
         CardRarity? rarity = await repo.FindRarityAsync(dto.CardRarityId, ct);
         if (rarity is null) throw new ArgumentException($"CardRarityId {dto.CardRarityId} not found");
 
-        CardSet? set = null;
-        if (dto.CardSetId is not null)
-        {
-            set = await repo.FindSetAsync(dto.CardSetId.Value, ct);
-            if (set is null) throw new ArgumentException($"CardSetId {dto.CardSetId} not found");
-        }
+        CardCollection? set = await repo.FindSetAsync(dto.CardCollectionId, ct);
+        if (set is null) 
+            throw new ArgumentException($"CardSetId {dto.CardCollectionId} not found");
+
+        var toolType = await repo.FindCardTypeByNameAsync("Tool", ct) ?? throw new ArgumentException("CardType 'Tool' not found");
 
         var card = new Card
         {
-            Kind = CardKind.Tool,
+            CardTypeId = toolType.Id,
+            Type = toolType,
             Name = dto.Name,
-            Description = dto.Description,
-            Specials = dto.IsPromo ? CardSpecial.Promo : CardSpecial.None,
+            Description = dto.Description ?? string.Empty,
             CardRarityId = dto.CardRarityId,
             Rarity = rarity,
-            CardSetId = dto.CardSetId,
-            CardSet = set,
-            SerieNumber = dto.SerieNumber,
+            CardCollectionId = dto.CardCollectionId,
+            Collection = set,
+            CollectionNumber = dto.CollectionNumber,
         };
+        if (dto.CardSpecialIds?.Count > 0)
+        {
+            card.Specials = await repo.FindCardSpecialsByIdsAsync(dto.CardSpecialIds, ct);
+        }
         await repo.AddCardAsync(card, ct);
 
         var tool = new CardTool { Card = card };
@@ -183,10 +198,10 @@ public class CardService(ICardRepository repo) : ICardService
             Id = card.Id,
             Name = card.Name,
             Description = card.Description,
-            IsPromo = (card.Specials & CardSpecial.Promo) != 0,
+            CardSpecialIds = card.Specials.Select(s => s.Id).ToList(),
             CardRarityId = card.CardRarityId,
-            CardSetId = card.CardSetId,
-            SerieNumber = card.SerieNumber,
+            CardSetId = card.CardCollectionId,
+            SerieNumber = card.CollectionNumber,
         };
     }
 
@@ -195,24 +210,23 @@ public class CardService(ICardRepository repo) : ICardService
         CardRarity? rarity = await repo.FindRarityAsync(dto.CardRarityId, ct);
         if (rarity is null) throw new ArgumentException($"CardRarityId {dto.CardRarityId} not found");
 
-        CardSet? set = null;
-        if (dto.CardSetId is not null)
-        {
-            set = await repo.FindSetAsync(dto.CardSetId.Value, ct);
-            if (set is null) throw new ArgumentException($"CardSetId {dto.CardSetId} not found");
-        }
+        CardCollection? set = await repo.FindSetAsync(dto.CardCollectionId, ct);
+        if (set is null) 
+            throw new ArgumentException($"CardSetId {dto.CardCollectionId} not found");
+
+        var itemType = await repo.FindCardTypeByNameAsync("Item", ct) ?? throw new ArgumentException("CardType 'Item' not found");
 
         var card = new Card
         {
-            Kind = CardKind.Item,
+            CardTypeId = itemType.Id,
+            Type = itemType,
             Name = dto.Name,
-            Description = dto.Description,
-            Specials = dto.IsPromo ? CardSpecial.Promo : CardSpecial.None,
+            Description = dto.Description ?? string.Empty,
             CardRarityId = dto.CardRarityId,
             Rarity = rarity,
-            CardSetId = dto.CardSetId,
-            CardSet = set,
-            SerieNumber = dto.SerieNumber,
+            CardCollectionId = dto.CardCollectionId,
+            Collection = set,
+            CollectionNumber = dto.CollectionNumber,
         };
         await repo.AddCardAsync(card, ct);
 
@@ -225,10 +239,10 @@ public class CardService(ICardRepository repo) : ICardService
             Id = card.Id,
             Name = card.Name,
             Description = card.Description,
-            IsPromo = (card.Specials & CardSpecial.Promo) != 0,
+            CardSpecialIds = card.Specials.Select(s => s.Id).ToList(),
             CardRarityId = card.CardRarityId,
-            CardSetId = card.CardSetId,
-            SerieNumber = card.SerieNumber,
+            CardSetId = card.CardCollectionId,
+            SerieNumber = card.CollectionNumber,
         };
     }
 
@@ -237,25 +251,28 @@ public class CardService(ICardRepository repo) : ICardService
         CardRarity? rarity = await repo.FindRarityAsync(dto.CardRarityId, ct);
         if (rarity is null) throw new ArgumentException($"CardRarityId {dto.CardRarityId} not found");
 
-        CardSet? set = null;
-        if (dto.CardSetId is not null)
-        {
-            set = await repo.FindSetAsync(dto.CardSetId.Value, ct);
-            if (set is null) throw new ArgumentException($"CardSetId {dto.CardSetId} not found");
-        }
+        CardCollection? set = await repo.FindSetAsync(dto.CardCollectionId, ct);
+        if (set is null) 
+                throw new ArgumentException($"CardSetId {dto.CardCollectionId} not found");
+
+        var supporterType = await repo.FindCardTypeByNameAsync("Supporter", ct) ?? throw new ArgumentException("CardType 'Supporter' not found");
 
         var card = new Card
         {
-            Kind = CardKind.Supporter,
+            CardTypeId = supporterType.Id,
+            Type = supporterType,
             Name = dto.Name,
-            Description = dto.Description,
-            Specials = dto.IsPromo ? CardSpecial.Promo : CardSpecial.None,
+            Description = dto.Description ?? string.Empty,
             CardRarityId = dto.CardRarityId,
             Rarity = rarity,
-            CardSetId = dto.CardSetId,
-            CardSet = set,
-            SerieNumber = dto.SerieNumber,
+            CardCollectionId = dto.CardCollectionId,
+            Collection = set,
+            CollectionNumber = dto.CollectionNumber,
         };
+        if (dto.CardSpecialIds?.Count > 0)
+        {
+            card.Specials = await repo.FindCardSpecialsByIdsAsync(dto.CardSpecialIds, ct);
+        }
         await repo.AddCardAsync(card, ct);
 
         var supporter = new CardSupporter { Card = card };
@@ -267,10 +284,10 @@ public class CardService(ICardRepository repo) : ICardService
             Id = card.Id,
             Name = card.Name,
             Description = card.Description,
-            IsPromo = (card.Specials & CardSpecial.Promo) != 0,
+            CardSpecialIds = card.Specials.Select(s => s.Id).ToList(),
             CardRarityId = card.CardRarityId,
-            CardSetId = card.CardSetId,
-            SerieNumber = card.SerieNumber,
+            CardSetId = card.CardCollectionId,
+            SerieNumber = card.CollectionNumber,
         };
     }
 
@@ -307,15 +324,15 @@ public class CardService(ICardRepository repo) : ICardService
             Id = card.Id,
             Name = card.Name,
             Description = card.Description,
-            IsPromo = (card.Specials & CardSpecial.Promo) != 0,
+            CardSpecialIds = card.Specials.Select(s => s.Id).ToList(),
             CardRarityId = card.CardRarityId,
-            CardSetId = card.CardSetId,
-            SerieNumber = card.SerieNumber,
-            Specials = (int)pokemon.Specials,
-            Stage = (int)pokemon.Stage,
+            CardSetId = card.CardCollectionId,
+            SerieNumber = card.CollectionNumber,
+            PokemonSpecialIds = pokemon.Specials.Select(s => s.Id).ToList(),
+            Stage = pokemon.PokemonStageId,
             Hp = pokemon.Hp,
-            TypeId = pokemon.TypeId,
-            WeaknessTypeId = pokemon.WeaknessTypeId,
+            TypeId = pokemon.PokemonTypeId,
+            WeaknessTypeId = pokemon.WeaknessPokemonTypeId,
             RetreatCost = pokemon.RetreatCost,
             PokemonAbilityId = pokemon.PokemonAbilityId,
             Attacks = pokemon.Attacks.Select(a => new PokemonAttackOutputDTO

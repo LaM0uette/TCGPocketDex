@@ -1,17 +1,12 @@
 ﻿namespace TCGPocketDex.Contracts.DTO;
 
-public class CardFossilOutputDTO
+public class CardInputDTO
 {
-    public int Id { get; set; }
-
-    // Common card fields
     public required string Name { get; set; }
     public string Description { get; set; } = string.Empty;
+    
     public List<int> CardSpecialIds { get; set; } = [];
     public required int CardRarityId { get; set; }
-    public int? CardSetId { get; set; }
-    public int? SerieNumber { get; set; }
-
-    // Fossil specific
-    public int Hp { get; set; }
+    public int CardCollectionId { get; set; }
+    public int CollectionNumber { get; set; }
 }

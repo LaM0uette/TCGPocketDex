@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TCGPocketDex.Api.Entity;
+namespace TCGPocketDex.Api.Entities;
 
 public class PokemonAttackTranslation
 {
@@ -16,5 +16,5 @@ public class PokemonAttackTranslation
     public required string Name { get; set; }
 
     [MaxLength(4000)]
-    public string? Description { get; set; }
+    public string Description { get; set; } = string.Empty;
 }

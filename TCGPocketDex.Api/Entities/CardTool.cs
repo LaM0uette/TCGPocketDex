@@ -1,4 +1,4 @@
-﻿namespace TCGPocketDex.Api.Entity;
+﻿namespace TCGPocketDex.Api.Entities;
 
 public class CardTool
 {

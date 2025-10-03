@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TCGPocketDex.Api.Entity;
+namespace TCGPocketDex.Api.Entities;
 
-public class CardSet
+public class CardCollection
 {
     public int Id { get; init; }
 
@@ -15,7 +15,7 @@ public class CardSet
     [MaxLength(100)]
     public required string Name { get; set; }
 
-    public ICollection<CardSetTranslation> Translations { get; set; } = [];
+    public ICollection<CardCollectionTranslation> Translations { get; set; } = [];
 
     public ICollection<Card> Cards { get; init; } = [];
 }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TCGPocketDex.Api.Entity;
+namespace TCGPocketDex.Api.Entities;
 
 public class CardRarity
 {

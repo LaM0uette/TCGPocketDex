@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TCGPocketDex.Api.Entity;
+namespace TCGPocketDex.Api.Entities;
 
-public class PokemonType
+public class PokemonStage
 {
     public int Id { get; init; }
-    
+
     [MaxLength(30)]
     public required string Name { get; set; }
 
-    public ICollection<PokemonTypeTranslation> Translations { get; set; } = [];
+    public ICollection<PokemonStageTranslation> Translations { get; set; } = [];
 }
