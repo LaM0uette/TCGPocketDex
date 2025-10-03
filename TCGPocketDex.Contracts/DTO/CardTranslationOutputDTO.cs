@@ -14,5 +14,5 @@ public class CardTranslationOutputDTO
     public required string Name { get; set; }
     
     [JsonPropertyName("description")]
-    public string Description { get; set; } = string.Empty;
+    public string? Description { get; set; }
 }

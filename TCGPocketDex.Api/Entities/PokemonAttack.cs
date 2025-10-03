@@ -10,7 +10,7 @@ public class PokemonAttack
     public required string Name { get; set; }
 
     [MaxLength(4000)]
-    public string Description { get; set; } = string.Empty;
+    public string? Description { get; set; }
     
     public int Damage { get; set; }
 

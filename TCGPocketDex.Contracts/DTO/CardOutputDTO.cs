@@ -14,7 +14,7 @@ public class CardOutputDTO
     public required string Name { get; set; }
     
     [JsonPropertyName("description")]
-    public string Description { get; set; } = string.Empty;
+    public string? Description { get; set; }
     
     [JsonPropertyName("specials")]
     public List<CardSpecialOutputDTO> Specials { get; set; } = [];

@@ -13,7 +13,7 @@ public class Card
     public required string Name { get; set; }
     
     [MaxLength(4000)]
-    public string Description { get; set; } = string.Empty;
+    public string? Description { get; set; }
     
     public ICollection<CardSpecial> Specials { get; set; } = [];
     
