@@ -8,4 +8,6 @@ public class CardSpecial
     
     [MaxLength(100)]
     public required string Name { get; set; }
+
+    public ICollection<CardSpecialTranslation> Translations { get; set; } = [];
 }

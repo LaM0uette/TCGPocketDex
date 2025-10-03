@@ -8,4 +8,6 @@ public class CardRarity
 
     [MaxLength(50)]
     public required string Name { get; set; }
+
+    public ICollection<CardRarityTranslation> Translations { get; set; } = [];
 }

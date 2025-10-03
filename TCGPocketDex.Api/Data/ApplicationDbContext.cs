@@ -20,10 +20,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<CardCollection> CardSets => Set<CardCollection>();
     public DbSet<CardCollectionTranslation> CardSetTranslations => Set<CardCollectionTranslation>();
     public DbSet<CardRarity> CardRarities => Set<CardRarity>();
+    public DbSet<CardRarityTranslation> CardRarityTranslations => Set<CardRarityTranslation>();
 
     public DbSet<CardType> CardTypes => Set<CardType>();
     public DbSet<CardTypeTranslation> CardTypeTranslations => Set<CardTypeTranslation>();
     public DbSet<CardSpecial> CardSpecials => Set<CardSpecial>();
+    public DbSet<CardSpecialTranslation> CardSpecialTranslations => Set<CardSpecialTranslation>();
 
     public DbSet<CardPokemon> CardPokemons => Set<CardPokemon>();
     public DbSet<CardSupporter> CardSupporters => Set<CardSupporter>();
@@ -57,10 +59,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<CardCollection>().ToTable(nameof(CardCollection), _schemaData);
         modelBuilder.Entity<CardCollectionTranslation>().ToTable(nameof(CardCollectionTranslation), _schemaTranslation);
         modelBuilder.Entity<CardRarity>().ToTable(nameof(CardRarity), _schemaRef);
+        modelBuilder.Entity<CardRarityTranslation>().ToTable(nameof(CardRarityTranslation), _schemaTranslation);
 
         modelBuilder.Entity<CardType>().ToTable(nameof(CardType), _schemaRef);
         modelBuilder.Entity<CardTypeTranslation>().ToTable(nameof(CardTypeTranslation), _schemaTranslation);
         modelBuilder.Entity<CardSpecial>().ToTable(nameof(CardSpecial), _schemaRef);
+        modelBuilder.Entity<CardSpecialTranslation>().ToTable(nameof(CardSpecialTranslation), _schemaTranslation);
 
         modelBuilder.Entity<CardPokemon>().ToTable(nameof(CardPokemon), _schemaData);
         modelBuilder.Entity<CardSupporter>().ToTable(nameof(CardSupporter), _schemaData);
@@ -221,6 +225,20 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasOne(t => t.CardType)
             .WithMany(ct => ct.Translations)
             .HasForeignKey(t => t.CardTypeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // CardRarity translations
+        modelBuilder.Entity<CardRarityTranslation>()
+            .HasOne(t => t.CardRarity)
+            .WithMany(r => r.Translations)
+            .HasForeignKey(t => t.CardRarityId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // CardSpecial translations
+        modelBuilder.Entity<CardSpecialTranslation>()
+            .HasOne(t => t.CardSpecial)
+            .WithMany(s => s.Translations)
+            .HasForeignKey(t => t.CardSpecialId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Many-to-many: PokemonAttack.Costs <-> PokemonType

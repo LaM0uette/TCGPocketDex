@@ -9,4 +9,7 @@ public class CardSpecialOutputDTO
     
     [JsonPropertyName("name")]
     public required string Name { get; set; }
+    
+    [JsonPropertyName("translation")]
+    public List<CardSpecialTranslationOutputDTO> Translation { get; set; } = [];
 }

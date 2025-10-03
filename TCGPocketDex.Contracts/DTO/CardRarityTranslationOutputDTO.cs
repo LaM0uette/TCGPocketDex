@@ -2,14 +2,14 @@
 
 namespace TCGPocketDex.Contracts.DTO;
 
-public class CardRarityOutputDTO
+public class CardRarityTranslationOutputDTO
 {
     [JsonPropertyName("id")]
-    public int Id { get; set; }
+    public int Id { get; init; }
+    
+    [JsonPropertyName("culture")]
+    public required string Culture { get; set; }
     
     [JsonPropertyName("name")]
     public required string Name { get; set; }
-    
-    [JsonPropertyName("translation")]
-    public List<CardRarityTranslationOutputDTO> Translations { get; set; } = [];
 }
