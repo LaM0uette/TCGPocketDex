@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TCGPocketDex.Api.Data;
+using TCGPocketDex.Api.Endpoints;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -54,9 +55,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseStaticFiles();
 
-// Endpoints for creating cards (moved to dedicated file)
-TCGPocketDex.Api.Endpoints.CardsEndpoints.MapCardEndpoints(app);
-// Endpoints for translations
-TCGPocketDex.Api.Endpoints.TranslationsEndpoints.MapTranslationEndpoints(app);
+app.MapCardEndpoints();
+app.MapTranslationEndpoints();
 
 app.Run();
