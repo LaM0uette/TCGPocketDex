@@ -36,5 +36,10 @@ public class CardService : ICardService
         }
     }
 
+    public Task<List<TCGPocketDex.Contracts.DTO.CardOutputDTO>> GetAllPublicDtoAsync(CancellationToken ct = default)
+    {
+        return _apiClient.GetAsync<List<TCGPocketDex.Contracts.DTO.CardOutputDTO>>("/public/cards", ct);
+    }
+
     #endregion
 }

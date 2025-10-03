@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Cryptography;
 using TCGPocketDex.Api.Data;
 using TCGPocketDex.Api.Endpoints;
 
@@ -19,6 +22,44 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
+});
+
+// JWT Authentication — only the SDK (holding the private key) can call the API
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    string? publicKeyPem = builder.Configuration["Jwt:PublicKeyPem"] ?? Environment.GetEnvironmentVariable("TCGPDK_JWT_PUBLIC_KEY_PEM");
+    if (string.IsNullOrWhiteSpace(publicKeyPem))
+    {
+        // In dev, allow empty to avoid immediate crash; but all protected endpoints will still 401.
+        publicKeyPem = "";
+    }
+
+    string validIssuer = builder.Configuration["Jwt:Issuer"] ?? Environment.GetEnvironmentVariable("TCGPDK_JWT_ISSUER") ?? "TCGPocketDex.SDK";
+    string validAudience = builder.Configuration["Jwt:Audience"] ?? Environment.GetEnvironmentVariable("TCGPDK_JWT_AUDIENCE") ?? "TCGPocketDex.Api";
+
+    SecurityKey? signingKey = null;
+    if (!string.IsNullOrWhiteSpace(publicKeyPem))
+    {
+        RSA rsa = RSA.Create();
+        rsa.ImportFromPem(publicKeyPem);
+        signingKey = new RsaSecurityKey(rsa);
+    }
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = signingKey ?? new SymmetricSecurityKey(new byte[32]), // placeholder to avoid null; token will still fail validation if empty
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidIssuer = validIssuer,
+        ValidAudience = validAudience,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.FromSeconds(30)
+    };
 });
 
 builder.Services.AddAuthorization();
@@ -52,6 +93,7 @@ app.UseCors("AppPolicy");
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseStaticFiles();
 

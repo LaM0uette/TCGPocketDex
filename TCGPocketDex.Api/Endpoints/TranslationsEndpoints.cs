@@ -8,7 +8,7 @@ public static class TranslationsEndpoints
 {
     public static IEndpointRouteBuilder MapTranslationEndpoints(this IEndpointRouteBuilder app)
     {
-        RouteGroupBuilder group = app.MapGroup("/cards/{cardId:int}/translations");
+        RouteGroupBuilder group = app.MapGroup("/cards/{cardId:int}/translations").RequireAuthorization();
 
         group.MapPost("", AddCardTranslationAsync)
         .WithName("AddCardTranslation")

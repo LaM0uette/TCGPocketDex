@@ -13,7 +13,7 @@ public static class CardsEndpoints
 
     public static IEndpointRouteBuilder MapCardEndpoints(this IEndpointRouteBuilder app)
     {
-        RouteGroupBuilder group = app.MapGroup("/cards").WithTags("Cards");
+        RouteGroupBuilder group = app.MapGroup("/cards").WithTags("Cards").RequireAuthorization();
 
         group.MapPost("/pokemon", CreateCardPokemonAsync);
         group.MapPost("/fossil", CreateCardFossilAsync);
@@ -23,6 +23,10 @@ public static class CardsEndpoints
         
         group.MapGet("/", GetAllCardsAsync);
         group.MapGet("/{id:int}", GetCardByIdAsync);
+        
+        // Public, read-only route for Web client (no auth)
+        RouteGroupBuilder publicGroup = app.MapGroup("/public/cards").WithTags("Public Cards");
+        publicGroup.MapGet("/", GetAllCardsAsync);
         
         return app;
     }
@@ -102,7 +106,14 @@ public static class CardsEndpoints
     
     private static async Task<IResult> GetAllCardsAsync(ApplicationDbContext db, CancellationToken ct)
     {
-        List<Card> cards = await db.Cards.AsNoTracking().ToListAsync(ct);
+        List<Card> cards = await db.Cards
+            .AsNoTracking()
+            .Include(c => c.Type)
+            .Include(c => c.Rarity)
+            .Include(c => c.Collection)
+            .Include(c => c.Specials)
+            .Include(c => c.Translations)
+            .ToListAsync(ct);
         List<CardOutputDTO> dtos = cards.Select(c => c.ToOutputDTO()).ToList();
         
         return Results.Ok(dtos);
@@ -110,7 +121,14 @@ public static class CardsEndpoints
 
     private static async Task<IResult> GetCardByIdAsync(int id, ApplicationDbContext db, CancellationToken ct)
     {
-        Card? card = await db.Cards.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id, ct);
+        Card? card = await db.Cards
+            .AsNoTracking()
+            .Include(c => c.Type)
+            .Include(c => c.Rarity)
+            .Include(c => c.Collection)
+            .Include(c => c.Specials)
+            .Include(c => c.Translations)
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
         if (card is null)
             return Results.NotFound();
         
