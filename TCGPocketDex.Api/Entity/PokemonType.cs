@@ -1,10 +1,13 @@
-﻿namespace TCGPocketDex.Api.Entity;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TCGPocketDex.Api.Entity;
 
 public class PokemonType
 {
     public int Id { get; init; }
+    
+    [MaxLength(30)]
+    public required string Name { get; set; }
 
-    public ICollection<PokemonTypeTranslation> Translations { get; init; } = [];
-
-    public ICollection<PokemonAttack> AttacksUsingType { get; init; } = [];
+    public ICollection<PokemonTypeTranslation> Translations { get; set; } = [];
 }

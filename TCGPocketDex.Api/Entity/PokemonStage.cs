@@ -1,8 +1,8 @@
 ﻿namespace TCGPocketDex.Api.Entity;
 
-public class PokemonStage
+public enum PokemonStage
 {
-    public int Id { get; init; }
-
-    public ICollection<PokemonStageTranslation> Translations { get; init; } = [];
+    Basic,
+    Stage1,
+    Stage2
 }

@@ -8,7 +8,4 @@ public class CardRarity
 
     [MaxLength(50)]
     public required string Name { get; set; }
-    
-    [MaxLength(255)]
-    public required string ImageUrl { get; set; }
 }

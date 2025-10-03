@@ -15,6 +15,6 @@ public class PokemonAttackTranslation
     [MaxLength(100)]
     public required string Name { get; set; }
 
-    [MaxLength(2000)]
+    [MaxLength(4000)]
     public string? Description { get; set; }
 }

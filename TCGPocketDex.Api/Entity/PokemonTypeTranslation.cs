@@ -14,7 +14,4 @@ public class PokemonTypeTranslation
 
     [MaxLength(30)]
     public required string Name { get; set; }
-
-    [MaxLength(255)]
-    public required string ImageUrl { get; set; }
 }

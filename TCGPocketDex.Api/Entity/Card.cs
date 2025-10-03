@@ -1,22 +1,34 @@
-﻿namespace TCGPocketDex.Api.Entity;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TCGPocketDex.Api.Entity;
 
 public class Card
 {
     public int Id { get; init; }
-
-    public ICollection<CardTranslation> Translations { get; init; } = [];
-
+    
+    public required CardKind Kind { get; set; }
+    
+    [MaxLength(100)]
+    public required string Name { get; set; }
+    
+    [MaxLength(4000)]
+    public string? Description { get; set; }
+    
+    public CardSpecial Specials { get; set; } = CardSpecial.None;
+    
     public int CardRarityId { get; set; }
     public required CardRarity Rarity { get; set; }
 
-    public int? BoosterId { get; set; }
-    public Booster? Booster { get; set; }
+    public int? CardSetId { get; set; }
+    public CardSet? CardSet { get; set; }
 
-    public int? PromoSeriesId { get; set; }
-    public PromoSeries? PromoSeries { get; set; }
+    public int? SerieNumber { get; set; }
+    
+    public CardPokemon? Pokemon { get; set; }
+    public CardTool? Tool { get; set; }
+    public CardSupporter? Supporter { get; set; }
+    public CardFossil? Fossil { get; set; }
+    public CardItem? Item { get; set; }
 
-    public int? CardExtensionId { get; set; }
-    public CardExtension? Extension { get; set; }
-
-    public int? ExtensionCardNumber { get; set; }
+    public ICollection<CardTranslation> Translations { get; set; } = [];
 }
