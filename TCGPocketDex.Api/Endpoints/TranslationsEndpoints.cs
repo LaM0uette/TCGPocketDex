@@ -17,12 +17,16 @@ public static class TranslationsEndpoints
         return app;
     }
 
-    private static async Task<IResult> AddCardTranslationAsync([FromRoute] int cardId, [FromBody] CardTranslationInputDTO dto, ICardService service, CancellationToken ct)
+    private static async Task<IResult> AddCardTranslationAsync(
+        [FromRoute] int cardId,
+        [FromBody] CardTranslationInputDTO dto,
+        ICardService service,
+        CancellationToken ct)
     {
         try
         {
-            CardTranslationOutputDTO result = await service.AddCardTranslationAsync(cardId, dto, ct);
-            return Results.Created($"/cards/{cardId}/translations/{result.Id}", result);
+            await service.AddCardTranslationAsync(cardId, dto, ct);
+            return Results.Created($"/cards/{cardId}/translations", null);
         }
         catch (ArgumentException ex)
         {

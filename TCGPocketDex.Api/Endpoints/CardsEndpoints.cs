@@ -35,8 +35,8 @@ public static class CardsEndpoints
     {
         try
         {
-            CardPokemonOutputDTO result = await service.CreatePokemonAsync(dto, ct);
-            return Results.Created($"/cards/{result.Id}", result);
+            await service.CreatePokemonAsync(dto, ct);
+            return Results.Created($"/cards/pokemon", null); // 201 sans body
         }
         catch (ArgumentException ex)
         {
@@ -48,8 +48,8 @@ public static class CardsEndpoints
     {
         try
         {
-            CardFossilOutputDTO result = await service.CreateFossilAsync(dto, ct);
-            return Results.Created($"/cards/{result.Id}", result);
+            await service.CreateFossilAsync(dto, ct);
+            return Results.Created($"/cards/fossil", null);
         }
         catch (ArgumentException ex)
         {
@@ -61,8 +61,8 @@ public static class CardsEndpoints
     {
         try
         {
-            CardToolOutputDTO result = await service.CreateToolAsync(dto, ct);
-            return Results.Created($"/cards/{result.Id}", result);
+            await service.CreateToolAsync(dto, ct);
+            return Results.Created($"/cards/tool", null);
         }
         catch (ArgumentException ex)
         {
@@ -74,8 +74,8 @@ public static class CardsEndpoints
     {
         try
         {
-            CardItemOutputDTO result = await service.CreateItemAsync(dto, ct);
-            return Results.Created($"/cards/{result.Id}", result);
+            await service.CreateItemAsync(dto, ct);
+            return Results.Created($"/cards/item", null);
         }
         catch (ArgumentException ex)
         {
@@ -87,8 +87,8 @@ public static class CardsEndpoints
     {
         try
         {
-            CardSupporterOutputDTO result = await service.CreateSupporterAsync(dto, ct);
-            return Results.Created($"/cards/{result.Id}", result);
+            await service.CreateSupporterAsync(dto, ct);
+            return Results.Created($"/cards/supporter", null);
         }
         catch (ArgumentException ex)
         {
