@@ -1,4 +1,5 @@
 ﻿using TCGPocketDex.Api.Entities;
+using TCGPocketDex.Api.Mappings;
 using TCGPocketDex.Api.Repositories;
 using TCGPocketDex.Contracts.DTO;
 
@@ -56,10 +57,14 @@ public class CardService(ICardRepository repo) : ICardService
 
         await repo.AddCardAsync(card, ct);
 
+        var stage = await repo.FindPokemonStageAsync(dto.PokemonStageId, ct);
+        if (stage is null) throw new ArgumentException($"PokemonStageId {dto.PokemonStageId} not found");
+
         var pokemon = new CardPokemon
         {
             Card = card,
             PokemonStageId = dto.PokemonStageId,
+            Stage = stage,
             Hp = dto.Hp,
             PokemonTypeId = dto.PokemonTypeId,
             Type = type,
@@ -107,7 +112,7 @@ public class CardService(ICardRepository repo) : ICardService
         await repo.AddPokemonAsync(pokemon, ct);
         await repo.SaveChangesAsync(ct);
 
-        return MapPokemon(card, pokemon);
+        return card.ToPokemonOutputDTO(pokemon);
     }
 
     public async Task<CardFossilOutputDTO> CreateFossilAsync(CardFossilInputDTO dto, CancellationToken ct = default)
@@ -147,17 +152,7 @@ public class CardService(ICardRepository repo) : ICardService
         await repo.AddFossilAsync(fossil, ct);
         await repo.SaveChangesAsync(ct);
 
-        return new CardFossilOutputDTO
-        {
-            Id = card.Id,
-            Name = card.Name,
-            Description = card.Description,
-            CardSpecialIds = card.Specials.Select(s => s.Id).ToList(),
-            CardRarityId = card.CardRarityId,
-            CardSetId = card.CardCollectionId,
-            SerieNumber = card.CollectionNumber,
-            Hp = fossil.Hp
-        };
+        return card.ToFossilOutputDTO(fossil);
     }
 
     public async Task<CardToolOutputDTO> CreateToolAsync(CardToolInputDTO dto, CancellationToken ct = default)
@@ -193,16 +188,7 @@ public class CardService(ICardRepository repo) : ICardService
         await repo.AddToolAsync(tool, ct);
         await repo.SaveChangesAsync(ct);
 
-        return new CardToolOutputDTO
-        {
-            Id = card.Id,
-            Name = card.Name,
-            Description = card.Description,
-            CardSpecialIds = card.Specials.Select(s => s.Id).ToList(),
-            CardRarityId = card.CardRarityId,
-            CardSetId = card.CardCollectionId,
-            SerieNumber = card.CollectionNumber,
-        };
+        return card.ToToolOutputDTO(tool);
     }
 
     public async Task<CardItemOutputDTO> CreateItemAsync(CardItemInputDTO dto, CancellationToken ct = default)
@@ -234,16 +220,7 @@ public class CardService(ICardRepository repo) : ICardService
         await repo.AddItemAsync(item, ct);
         await repo.SaveChangesAsync(ct);
 
-        return new CardItemOutputDTO
-        {
-            Id = card.Id,
-            Name = card.Name,
-            Description = card.Description,
-            CardSpecialIds = card.Specials.Select(s => s.Id).ToList(),
-            CardRarityId = card.CardRarityId,
-            CardSetId = card.CardCollectionId,
-            SerieNumber = card.CollectionNumber,
-        };
+        return card.ToItemOutputDTO(item);
     }
 
     public async Task<CardSupporterOutputDTO> CreateSupporterAsync(CardSupporterInputDTO dto, CancellationToken ct = default)
@@ -279,16 +256,7 @@ public class CardService(ICardRepository repo) : ICardService
         await repo.AddSupporterAsync(supporter, ct);
         await repo.SaveChangesAsync(ct);
 
-        return new CardSupporterOutputDTO
-        {
-            Id = card.Id,
-            Name = card.Name,
-            Description = card.Description,
-            CardSpecialIds = card.Specials.Select(s => s.Id).ToList(),
-            CardRarityId = card.CardRarityId,
-            CardSetId = card.CardCollectionId,
-            SerieNumber = card.CollectionNumber,
-        };
+        return card.ToSupporterOutputDTO(supporter);
     }
 
     public async Task<CardTranslationOutputDTO> AddCardTranslationAsync(int cardId, CardTranslationInputDTO dto, CancellationToken ct = default)
@@ -310,39 +278,10 @@ public class CardService(ICardRepository repo) : ICardService
         return new CardTranslationOutputDTO
         {
             Id = translation.Id,
-            CardId = card.Id,
             Culture = translation.Culture,
             Name = translation.Name,
             Description = translation.Description,
         };
     }
 
-    private static CardPokemonOutputDTO MapPokemon(Card card, CardPokemon pokemon)
-    {
-        return new CardPokemonOutputDTO
-        {
-            Id = card.Id,
-            Name = card.Name,
-            Description = card.Description,
-            CardSpecialIds = card.Specials.Select(s => s.Id).ToList(),
-            CardRarityId = card.CardRarityId,
-            CardSetId = card.CardCollectionId,
-            SerieNumber = card.CollectionNumber,
-            PokemonSpecialIds = pokemon.Specials.Select(s => s.Id).ToList(),
-            Stage = pokemon.PokemonStageId,
-            Hp = pokemon.Hp,
-            TypeId = pokemon.PokemonTypeId,
-            WeaknessTypeId = pokemon.WeaknessPokemonTypeId,
-            RetreatCost = pokemon.RetreatCost,
-            PokemonAbilityId = pokemon.PokemonAbilityId,
-            Attacks = pokemon.Attacks.Select(a => new PokemonAttackOutputDTO
-            {
-                Id = a.Id,
-                Name = a.Name,
-                Description = a.Description,
-                Damage = a.Damage,
-                Costs = a.Costs.Select(c => c.Id).ToList(),
-            }).ToList()
-        };
-    }
 }

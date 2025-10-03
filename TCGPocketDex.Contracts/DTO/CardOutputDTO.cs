@@ -7,25 +7,28 @@ public class CardOutputDTO
     [JsonPropertyName("id")]
     public int Id { get; set; }
     
-    [JsonPropertyName("cardTypeId")]
-    public int CardTypeId { get; set; }
+    [JsonPropertyName("cardType")]
+    public required CardTypeOutputDTO Type { get; set; }
     
     [JsonPropertyName("name")]
-    public string Name { get; set; } = string.Empty;
+    public required string Name { get; set; }
     
     [JsonPropertyName("description")]
     public string Description { get; set; } = string.Empty;
     
-    [JsonPropertyName("cardSpecialIds")]
-    public List<int> CardSpecialIds { get; set; } = [];
+    [JsonPropertyName("specials")]
+    public List<CardSpecialOutputDTO> Specials { get; set; } = [];
     
-    [JsonPropertyName("cardRarityId")]
-    public int CardRarityId { get; set; }
+    [JsonPropertyName("rarity")]
+    public required CardRarityOutputDTO Rarity { get; set; }
     
-    [JsonPropertyName("cardSetId")]
-    public int CardSetId { get; set; }
+    [JsonPropertyName("collection")]
+    public required CardCollectionOutputDTO Collection { get; set; }
     
-    [JsonPropertyName("serieNumber")]
-    public int SerieNumber { get; set; }
+    [JsonPropertyName("collectionNumber")]
+    public int CollectionNumber { get; set; }
+    
+    [JsonPropertyName("translations")]
+    public List<CardTranslationOutputDTO> Translations { get; set; } = [];
 }
 

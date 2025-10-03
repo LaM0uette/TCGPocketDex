@@ -1,29 +1,31 @@
-﻿namespace TCGPocketDex.Contracts.DTO;
+﻿using System.Text.Json.Serialization;
 
-public class CardPokemonOutputDTO
+namespace TCGPocketDex.Contracts.DTO;
+
+public class CardPokemonOutputDTO : CardOutputDTO
 {
-    public int Id { get; set; }
+    [JsonPropertyName("specials")]
+    public List<PokemonSpecialOutputDTO> PokemonSpecials { get; set; } = [];
     
-    public required string Name { get; set; }
-    public string Description { get; set; } = string.Empty;
-    public List<int> CardSpecialIds { get; set; } = [];
-    public required int CardRarityId { get; set; }
-    public int? CardSetId { get; set; }
-    public int? SerieNumber { get; set; }
+    [JsonPropertyName("stage")]
+    public required PokemonStageOutputDTO Stage { get; set; }
 
-    // Pokemon specific fields
-    public List<int> PokemonSpecialIds { get; set; } = [];
-    public int Stage { get; set; }    // PokemonStage
-
+    [JsonPropertyName("hp")]
     public int Hp { get; set; }
 
-    public required int TypeId { get; set; }
-    public int? WeaknessTypeId { get; set; }
+    [JsonPropertyName("type")]
+    public required PokemonTypeOutputDTO PokemonType { get; set; }
+    
+    [JsonPropertyName("weakness")]
+    public PokemonTypeOutputDTO? Weakness { get; set; }
 
+    [JsonPropertyName("retreatCost")]
     public int RetreatCost { get; set; }
 
-    public int? PokemonAbilityId { get; set; }
+    [JsonPropertyName("ability")]
+    public PokemonAbilityOutputDTO? Ability { get; set; }
 
+    [JsonPropertyName("attacks")]
     public List<PokemonAttackOutputDTO> Attacks { get; set; } = [];
 }
 

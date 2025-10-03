@@ -51,6 +51,7 @@ public class CardRepository(ApplicationDbContext db) : ICardRepository
     public Task SaveChangesAsync(CancellationToken ct = default) => db.SaveChangesAsync(ct);
 
     public Task<PokemonType?> FindPokemonTypeAsync(int id, CancellationToken ct = default) => db.PokemonTypes.FirstOrDefaultAsync(t => t.Id == id, ct);
+    public Task<PokemonStage?> FindPokemonStageAsync(int id, CancellationToken ct = default) => db.PokemonStages.FirstOrDefaultAsync(s => s.Id == id, ct);
     public Task<PokemonAbility?> FindPokemonAbilityAsync(int id, CancellationToken ct = default) => db.PokemonAbilities.FirstOrDefaultAsync(a => a.Id == id, ct);
     public Task<CardRarity?> FindRarityAsync(int id, CancellationToken ct = default) => db.CardRarities.FirstOrDefaultAsync(r => r.Id == id, ct);
     public Task<CardCollection?> FindSetAsync(int id, CancellationToken ct = default) => db.CardSets.FirstOrDefaultAsync(s => s.Id == id, ct);
