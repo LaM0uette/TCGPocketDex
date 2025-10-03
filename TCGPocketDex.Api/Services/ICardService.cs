@@ -1,4 +1,4 @@
-﻿using TCGPocketDex.Contracts.Cards;
+﻿using TCGPocketDex.Contracts.DTO;
 
 namespace TCGPocketDex.Api.Services;
 

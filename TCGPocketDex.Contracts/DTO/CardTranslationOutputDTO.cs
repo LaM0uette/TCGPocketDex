@@ -1,11 +1,4 @@
-﻿namespace TCGPocketDex.Contracts.Cards;
-
-public class CardTranslationInputDTO
-{
-    public required string Culture { get; set; }
-    public required string Name { get; set; }
-    public string? Description { get; set; }
-}
+﻿namespace TCGPocketDex.Contracts.DTO;
 
 public class CardTranslationOutputDTO
 {

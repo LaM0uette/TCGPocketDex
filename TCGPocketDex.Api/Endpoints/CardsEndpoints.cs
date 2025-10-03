@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Routing;
-using TCGPocketDex.Api.Services;
-using TCGPocketDex.Contracts.Cards;
+﻿using TCGPocketDex.Api.Services;
+using TCGPocketDex.Contracts.DTO;
 
 namespace TCGPocketDex.Api.Endpoints;
 

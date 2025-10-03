@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TCGPocketDex.Api.Entity;
 using TCGPocketDex.Api.Repositories;
-using TCGPocketDex.Contracts.Cards;
+using TCGPocketDex.Contracts.DTO;
 
 namespace TCGPocketDex.Api.Services;
 
@@ -55,7 +55,7 @@ public class CardService(ICardRepository repo) : ICardService
         var pokemon = new CardPokemon
         {
             Card = card,
-            Specials = (PokemonSpecial)dto.Specials,
+            Specials = (PokemonSpecial)dto.PokemonSpecials,
             Stage = (PokemonStage)dto.Stage,
             Hp = dto.Hp,
             TypeId = dto.TypeId,

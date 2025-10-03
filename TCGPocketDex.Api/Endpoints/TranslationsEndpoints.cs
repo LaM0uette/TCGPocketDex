@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TCGPocketDex.Api.Services;
-using TCGPocketDex.Contracts.Cards;
+using TCGPocketDex.Contracts.DTO;
 
 namespace TCGPocketDex.Api.Endpoints;
 

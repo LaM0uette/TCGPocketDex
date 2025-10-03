@@ -1,8 +1,12 @@
-﻿namespace TCGPocketDex.Contracts.Cards;
+﻿using System.Text.Json.Serialization;
 
-public class CardPokemonInputDTO
+namespace TCGPocketDex.Contracts.DTO;
+
+public class CardPokemonOutputDTO
 {
-    // Common card fields
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
+    
     public required string Name { get; set; }
     public string? Description { get; set; }
     public bool IsPromo { get; set; }
@@ -11,7 +15,6 @@ public class CardPokemonInputDTO
     public int? SerieNumber { get; set; }
 
     // Pokemon specific fields
-    // Use ints for enums to avoid coupling. Values should match API enums.
     public int Specials { get; set; } // PokemonSpecial flags
     public int Stage { get; set; }    // PokemonStage
 
@@ -24,15 +27,6 @@ public class CardPokemonInputDTO
 
     public int? PokemonAbilityId { get; set; }
 
-    public List<PokemonAttackInputDTO> Attacks { get; set; } = [];
+    public List<PokemonAttackOutputDTO> Attacks { get; set; } = [];
 }
 
-public class PokemonAttackInputDTO
-{
-    public int Damage { get; set; }
-    public required string Name { get; set; }
-    public string? Description { get; set; }
-
-    // Costs are PokemonType Ids
-    public List<int> Costs { get; set; } = [];
-}
