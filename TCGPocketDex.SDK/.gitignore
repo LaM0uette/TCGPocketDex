@@ -28,6 +28,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+wwwroot/img/**
 
 # Visual Studo 2015 cache/options directory
 .vs/
@@ -202,6 +203,8 @@ __pycache__/
 Thumbs.db
 
 appsettings.json
+appsettings.Preproduction.json
+appsettings.Production.json
 
 secrets.json
 
