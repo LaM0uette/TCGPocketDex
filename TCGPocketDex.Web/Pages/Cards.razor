@@ -1,6 +1,6 @@
 ﻿@page "/cards"
 @using TCGPocketDex.SDK.Services
-@using TCGPocketDex.Contracts.DTO
+@using TCGPocketDex.Domain.Models
 @inject ICardService CardService
 
 <PageTitle>Cards</PageTitle>
@@ -38,13 +38,13 @@ else
 @code {
     private bool _loading = true;
     private string? _error;
-    private List<CardOutputDTO> _cards = new();
+    private List<Card> _cards = [];
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            _cards = await CardService.GetAllPublicDtoAsync();
+            _cards = await CardService.GetAllAsync();
         }
         catch (Exception ex)
         {
@@ -56,9 +56,8 @@ else
         }
     }
 
-    private static string GetCardImageUrl(CardOutputDTO card)
+    private static string GetCardImageUrl(Card card)
     {
-        // en images endpoint pattern provided by user
         return $"https://localhost:7057/img/cards/en/{card.Collection.Code}-{card.CollectionNumber}.webp";
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System.Net;
+using TCGPocketDex.Contracts.DTO;
+using TCGPocketDex.Domain.Models;
 using TCGPocketDex.SDK.Http;
-using TCGPocketDex.SDK.Models;
+using TCGPocketDex.SDK.Mappings;
 
 namespace TCGPocketDex.SDK.Services;
 
@@ -19,9 +21,12 @@ public class CardService : ICardService
 
     #region ICardService
 
-    public Task<List<Card>> GetAllAsync(CancellationToken ct = default)
+    public async Task<List<Card>> GetAllAsync(CancellationToken ct = default)
     {
-        return _apiClient.GetAsync<List<Card>>("/cards", ct);
+        List<CardOutputDTO> dtos = await _apiClient.GetAsync<List<CardOutputDTO>>("/cards", ct);
+        List<Card> cards = dtos.ToCards();
+        
+        return cards;
     }
 
     public async Task<Card?> GetByIdAsync(int id, CancellationToken ct = default)
@@ -34,11 +39,6 @@ public class CardService : ICardService
         {
             return null;
         }
-    }
-
-    public Task<List<TCGPocketDex.Contracts.DTO.CardOutputDTO>> GetAllPublicDtoAsync(CancellationToken ct = default)
-    {
-        return _apiClient.GetAsync<List<TCGPocketDex.Contracts.DTO.CardOutputDTO>>("/public/cards", ct);
     }
 
     #endregion

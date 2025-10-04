@@ -2,12 +2,11 @@
 
 public record Card(
     int Id,
-    int CardTypeId,
+    CardType Type,
     string Name,
     string Description,
     ICollection<CardSpecial> Specials,
     CardRarity Rarity,
-    int CardSetId,
-    int SerieNumber,
-    ICollection<CardTranslation> Translations
+    CardCollection Collection,
+    int CollectionNumber
 );

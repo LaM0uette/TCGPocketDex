@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.Text.Json;
-using TCGPocketDex.SDK.Services;
+﻿using System.Text.Json;
 
 namespace TCGPocketDex.SDK.Http;
 
@@ -18,18 +16,6 @@ public class ApiClient : IApiClient, IDisposable
             BaseAddress = new Uri("https://localhost:7057"), // TODO: Move to config
             Timeout = TimeSpan.FromSeconds(30)
         };
-        
-        // Automatically generate and attach a short-lived JWT signed by SDK's RSA private key when available.
-        try
-        {
-            IJwtTokenProvider tokenProvider = new JwtTokenProvider();
-            string jwtToken = tokenProvider.GetToken();
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-        }
-        catch
-        {
-            // In browser (Blazor WASM) we won't have the private key. Proceed without Authorization for public endpoints.
-        }
 
         _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
     }
@@ -44,8 +30,6 @@ public class ApiClient : IApiClient, IDisposable
         response.EnsureSuccessStatusCode();
         
         string json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        Console.WriteLine(json);
-        
         T? deserialize = JsonSerializer.Deserialize<T>(json, _jsonOptions);
         return deserialize ?? throw new JsonException("Deserialization returned null.");
     }

@@ -13,7 +13,7 @@ public static class CardsEndpoints
 
     public static IEndpointRouteBuilder MapCardEndpoints(this IEndpointRouteBuilder app)
     {
-        RouteGroupBuilder group = app.MapGroup("/cards").WithTags("Cards").RequireAuthorization();
+        RouteGroupBuilder group = app.MapGroup("/cards").WithTags("Cards");
 
         group.MapPost("/pokemon", CreateCardPokemonAsync);
         group.MapPost("/fossil", CreateCardFossilAsync);
@@ -23,10 +23,6 @@ public static class CardsEndpoints
         
         group.MapGet("/", GetAllCardsAsync);
         group.MapGet("/{id:int}", GetCardByIdAsync);
-        
-        // Public, read-only route for Web client (no auth)
-        RouteGroupBuilder publicGroup = app.MapGroup("/public/cards").WithTags("Public Cards");
-        publicGroup.MapGet("/", GetAllCardsAsync);
         
         return app;
     }

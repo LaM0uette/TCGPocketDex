@@ -1,7 +1,6 @@
 ﻿namespace TCGPocketDex.Domain.Models;
 
-public class CardType
-{
-    public int Id { get; set; }
-    public required string Name { get; set; }
-}
+public record CardType(
+    int Id,
+    string Name
+);
