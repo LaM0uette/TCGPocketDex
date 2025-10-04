@@ -2,6 +2,7 @@
 @using TCGPocketDex.SDK.Services
 @using TCGPocketDex.Domain.Models
 @inject ICardService CardService
+@inject NavigationManager Nav
 
 <PageTitle>Cards</PageTitle>
 
@@ -21,9 +22,11 @@ else
         <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:12px;">
             @foreach (var card in _cards)
             {
+                Console.WriteLine(card.ImageUrl ?? "No Image");
+                
                 <div style="border:1px solid #e0e0e0; border-radius:8px; padding:8px; background:#fff;">
                     <div style="text-align:center;">
-                        <img src=@GetCardImageUrl(card) alt=@card.Name style="max-width:100%; height:auto;" />
+                        <img src="@card.ImageUrl" alt="@card.Name" style="max-width:100%; height:auto;" />
                     </div>
                     <div style="margin-top:6px;">
                         <strong>@card.Name</strong><br />
@@ -39,12 +42,17 @@ else
     private bool _loading = true;
     private string? _error;
     private List<Card> _cards = [];
+    private string? _lng;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            _cards = await CardService.GetAllAsync();
+            var uri = new Uri(Nav.Uri);
+            _lng = GetQueryParam(uri, "lng");
+            _lng = NormalizeLng(_lng);
+
+            _cards = await CardService.GetAllAsync(_lng);
         }
         catch (Exception ex)
         {
@@ -56,8 +64,28 @@ else
         }
     }
 
-    private static string GetCardImageUrl(Card card)
+    private static string? GetQueryParam(Uri uri, string key)
     {
-        return $"https://localhost:7057/img/cards/en/{card.Collection.Code}-{card.CollectionNumber}.webp";
+        var query = uri.Query;
+        if (string.IsNullOrEmpty(query)) return null;
+        if (query.StartsWith("?")) query = query[1..];
+        var parts = query.Split('&', StringSplitOptions.RemoveEmptyEntries);
+        foreach (var part in parts)
+        {
+            var kv = part.Split('=', 2);
+            if (kv.Length >= 1 && string.Equals(kv[0], key, StringComparison.OrdinalIgnoreCase))
+            {
+                return kv.Length == 2 ? Uri.UnescapeDataString(kv[1]) : string.Empty;
+            }
+        }
+
+        return null;
+    }
+
+    private static string NormalizeLng(string? culture)
+    {
+        if (string.IsNullOrWhiteSpace(culture)) return "";
+        var trimmed = culture.Trim();
+        return trimmed.Length >= 2 ? trimmed[..2].ToLowerInvariant() : trimmed.ToLowerInvariant();
     }
 }

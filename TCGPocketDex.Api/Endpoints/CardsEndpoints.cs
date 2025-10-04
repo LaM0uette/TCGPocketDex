@@ -100,37 +100,80 @@ public static class CardsEndpoints
     
     #region Read
     
-    private static async Task<IResult> GetAllCardsAsync(ApplicationDbContext db, CancellationToken ct)
+    private static async Task<IResult> GetAllCardsAsync(ApplicationDbContext db, HttpContext http, string? culture, CancellationToken ct)
     {
+        string resolvedCulture = ResolveCulture(http, culture);
+
         List<Card> cards = await db.Cards
             .AsNoTracking()
-            .Include(c => c.Type)
-            .Include(c => c.Rarity)
-            .Include(c => c.Collection)
-            .Include(c => c.Specials)
+            .Include(c => c.Type).ThenInclude(t => t.Translations)
+            .Include(c => c.Rarity).ThenInclude(r => r.Translations)
+            .Include(c => c.Collection).ThenInclude(s => s.Translations)
+            .Include(c => c.Specials).ThenInclude(s => s.Translations)
             .Include(c => c.Translations)
             .ToListAsync(ct);
-        List<CardOutputDTO> dtos = cards.Select(c => c.ToOutputDTO()).ToList();
+        
+        List<CardOutputDTO> dtos = cards.Select(c => c.ToOutputDTOWithCulture(resolvedCulture)).ToList();
         
         return Results.Ok(dtos);
     }
 
-    private static async Task<IResult> GetCardByIdAsync(int id, ApplicationDbContext db, CancellationToken ct)
+    private static async Task<IResult> GetCardByIdAsync(int id, ApplicationDbContext db, HttpContext http, string? culture, CancellationToken ct)
     {
+        string resolvedCulture = ResolveCulture(http, culture);
+
         Card? card = await db.Cards
             .AsNoTracking()
-            .Include(c => c.Type)
-            .Include(c => c.Rarity)
-            .Include(c => c.Collection)
-            .Include(c => c.Specials)
+            .Include(c => c.Type).ThenInclude(t => t.Translations)
+            .Include(c => c.Rarity).ThenInclude(r => r.Translations)
+            .Include(c => c.Collection).ThenInclude(s => s.Translations)
+            .Include(c => c.Specials).ThenInclude(s => s.Translations)
             .Include(c => c.Translations)
             .FirstOrDefaultAsync(c => c.Id == id, ct);
         if (card is null)
             return Results.NotFound();
         
-        CardOutputDTO dto = card.ToOutputDTO();
+        CardOutputDTO dto = card.ToOutputDTOWithCulture(resolvedCulture);
         return Results.Ok(dto);
     }
     
+    #endregion
+
+    #region Methods
+
+    private static string ResolveCulture(HttpContext http, string? culture)
+    {
+        // 1) support alternative query parameter '?lng=fr' with absolute priority
+        if (http.Request.Query.TryGetValue("lng", out var lngVals))
+        {
+            string? lng = NormalizeCulture(lngVals.ToString());
+            if (!string.IsNullOrEmpty(lng))
+                return lng;
+        }
+
+        // 2) explicit 'culture' parameter now secondary
+        string? norm = NormalizeCulture(culture);
+        if (!string.IsNullOrEmpty(norm)) 
+            return norm;
+        
+        // 3) fallback to Accept-Language header
+        string accept = http.Request.Headers.AcceptLanguage.ToString();
+        if (!string.IsNullOrWhiteSpace(accept) && accept.Trim().StartsWith("fr", StringComparison.OrdinalIgnoreCase))
+            return "fr";
+        
+        // 4) default
+        return "en";
+    }
+
+    private static string? NormalizeCulture(string? culture)
+    {
+        if (string.IsNullOrWhiteSpace(culture)) 
+            return null;
+        
+        string trimmed = culture.Trim();
+        
+        return trimmed.Length >= 2 ? trimmed[..2].ToLowerInvariant() : trimmed.ToLowerInvariant();
+    }
+
     #endregion
 }

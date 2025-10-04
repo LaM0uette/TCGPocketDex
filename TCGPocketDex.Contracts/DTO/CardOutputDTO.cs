@@ -16,6 +16,9 @@ public class CardOutputDTO
     [JsonPropertyName("description")]
     public string? Description { get; set; }
     
+    [JsonPropertyName("imageUrl")]
+    public string? ImageUrl { get; set; }
+    
     [JsonPropertyName("specials")]
     public List<CardSpecialOutputDTO> Specials { get; set; } = [];
     

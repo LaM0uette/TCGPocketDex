@@ -13,6 +13,7 @@ public static class CardMappings
             dto.Type.ToCardType(),
             dto.Name,
             dto.Description ?? string.Empty,
+            dto.ImageUrl ?? string.Empty,
             dto.Specials.ToCardSpecials(),
             dto.Rarity.ToCardRarity(),
             dto.Collection.ToCardCollection(),

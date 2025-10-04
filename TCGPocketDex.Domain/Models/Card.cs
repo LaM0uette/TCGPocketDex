@@ -5,6 +5,7 @@ public record Card(
     CardType Type,
     string Name,
     string Description,
+    string ImageUrl,
     ICollection<CardSpecial> Specials,
     CardRarity Rarity,
     CardCollection Collection,
