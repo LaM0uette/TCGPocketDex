@@ -203,6 +203,8 @@ __pycache__/
 Thumbs.db
 
 appsettings.json
+appsettings.Preproduction.json
+appsettings.Production.json
 
 secrets.json
 
