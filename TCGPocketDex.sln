@@ -10,6 +10,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCGPocketDex.Api", "TCGPock
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCGPocketDex.Domain", "TCGPocketDex.Domain\TCGPocketDex.Domain.csproj", "{96B49C97-E524-40A5-8EBC-8934EEA80909}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeadTopDeck", "LeadTopDeck\LeadTopDeck\LeadTopDeck.csproj", "{B1B200CF-5FA8-4BEA-9F17-61AACDF58FBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeadTopDeck.Client", "LeadTopDeck\LeadTopDeck.Client\LeadTopDeck.Client.csproj", "{A165AF32-1906-4166-8B37-E1E5AD6315B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +40,13 @@ Global
 		{96B49C97-E524-40A5-8EBC-8934EEA80909}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96B49C97-E524-40A5-8EBC-8934EEA80909}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96B49C97-E524-40A5-8EBC-8934EEA80909}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1B200CF-5FA8-4BEA-9F17-61AACDF58FBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1B200CF-5FA8-4BEA-9F17-61AACDF58FBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1B200CF-5FA8-4BEA-9F17-61AACDF58FBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1B200CF-5FA8-4BEA-9F17-61AACDF58FBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A165AF32-1906-4166-8B37-E1E5AD6315B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A165AF32-1906-4166-8B37-E1E5AD6315B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A165AF32-1906-4166-8B37-E1E5AD6315B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A165AF32-1906-4166-8B37-E1E5AD6315B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
