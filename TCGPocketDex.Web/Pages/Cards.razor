@@ -20,10 +20,8 @@ else
 {
     <div style="height:80vh; overflow:auto; border:1px solid #ccc; padding:8px;">
         <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:12px;">
-            @foreach (var card in _cards)
+            @foreach (Card card in _cards)
             {
-                Console.WriteLine(card.ImageUrl ?? "No Image");
-                
                 <div style="border:1px solid #e0e0e0; border-radius:8px; padding:8px; background:#fff;">
                     <div style="text-align:center;">
                         <img src="@card.ImageUrl" alt="@card.Name" style="max-width:100%; height:auto;" />
@@ -39,20 +37,20 @@ else
 }
 
 @code {
+    
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "lng")]
+    public string? Culture { get; set; }
+    
     private bool _loading = true;
     private string? _error;
     private List<Card> _cards = [];
-    private string? _lng;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var uri = new Uri(Nav.Uri);
-            _lng = GetQueryParam(uri, "lng");
-            _lng = NormalizeLng(_lng);
-
-            _cards = await CardService.GetAllAsync(_lng);
+            _cards = await CardService.GetAllAsync(Culture);
         }
         catch (Exception ex)
         {
@@ -62,30 +60,5 @@ else
         {
             _loading = false;
         }
-    }
-
-    private static string? GetQueryParam(Uri uri, string key)
-    {
-        var query = uri.Query;
-        if (string.IsNullOrEmpty(query)) return null;
-        if (query.StartsWith("?")) query = query[1..];
-        var parts = query.Split('&', StringSplitOptions.RemoveEmptyEntries);
-        foreach (var part in parts)
-        {
-            var kv = part.Split('=', 2);
-            if (kv.Length >= 1 && string.Equals(kv[0], key, StringComparison.OrdinalIgnoreCase))
-            {
-                return kv.Length == 2 ? Uri.UnescapeDataString(kv[1]) : string.Empty;
-            }
-        }
-
-        return null;
-    }
-
-    private static string NormalizeLng(string? culture)
-    {
-        if (string.IsNullOrWhiteSpace(culture)) return "";
-        var trimmed = culture.Trim();
-        return trimmed.Length >= 2 ? trimmed[..2].ToLowerInvariant() : trimmed.ToLowerInvariant();
     }
 }

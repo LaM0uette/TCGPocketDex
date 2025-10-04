@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 using TCGPocketDex.Api.Data;
 using TCGPocketDex.Api.Entities;
 using TCGPocketDex.Api.Mappings;
@@ -29,7 +30,7 @@ public static class CardsEndpoints
 
     #endregion
 
-    #region MyRegion
+    #region Create
 
     private static async Task<IResult> CreateCardPokemonAsync(ICardService service, CardPokemonInputDTO dto, CancellationToken ct)
     {
@@ -100,9 +101,9 @@ public static class CardsEndpoints
     
     #region Read
     
-    private static async Task<IResult> GetAllCardsAsync(ApplicationDbContext db, HttpContext http, string? culture, CancellationToken ct)
+    private static async Task<IResult> GetAllCardsAsync(ApplicationDbContext db, HttpContext http, CancellationToken ct)
     {
-        string resolvedCulture = ResolveCulture(http, culture);
+        string resolvedCulture = ResolveCulture(http);
 
         List<Card> cards = await db.Cards
             .AsNoTracking()
@@ -118,9 +119,9 @@ public static class CardsEndpoints
         return Results.Ok(dtos);
     }
 
-    private static async Task<IResult> GetCardByIdAsync(int id, ApplicationDbContext db, HttpContext http, string? culture, CancellationToken ct)
+    private static async Task<IResult> GetCardByIdAsync(int id, ApplicationDbContext db, HttpContext http, CancellationToken ct)
     {
-        string resolvedCulture = ResolveCulture(http, culture);
+        string resolvedCulture = ResolveCulture(http);
 
         Card? card = await db.Cards
             .AsNoTracking()
@@ -141,27 +142,21 @@ public static class CardsEndpoints
 
     #region Methods
 
-    private static string ResolveCulture(HttpContext http, string? culture)
+    private static string ResolveCulture(HttpContext http)
     {
-        // 1) support alternative query parameter '?lng=fr' with absolute priority
-        if (http.Request.Query.TryGetValue("lng", out var lngVals))
+        if (http.Request.Query.TryGetValue("lng", out StringValues lngVals))
         {
             string? lng = NormalizeCulture(lngVals.ToString());
+            
             if (!string.IsNullOrEmpty(lng))
                 return lng;
         }
-
-        // 2) explicit 'culture' parameter now secondary
-        string? norm = NormalizeCulture(culture);
-        if (!string.IsNullOrEmpty(norm)) 
-            return norm;
         
-        // 3) fallback to Accept-Language header
         string accept = http.Request.Headers.AcceptLanguage.ToString();
+        
         if (!string.IsNullOrWhiteSpace(accept) && accept.Trim().StartsWith("fr", StringComparison.OrdinalIgnoreCase))
             return "fr";
         
-        // 4) default
         return "en";
     }
 
