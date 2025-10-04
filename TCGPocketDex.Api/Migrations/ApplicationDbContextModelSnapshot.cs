@@ -16,11 +16,40 @@ namespace TCGPocketDex.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("preprod")
                 .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("CardCardSpecial", b =>
+                {
+                    b.Property<int>("CardId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CardSpecialId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CardId", "CardSpecialId");
+
+                    b.HasIndex("CardSpecialId");
+
+                    b.ToTable("CardCardSpecials", "data");
+                });
+
+            modelBuilder.Entity("CardPokemonPokemonSpecial", b =>
+                {
+                    b.Property<int>("CardId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PokemonSpecialId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CardId", "PokemonSpecialId");
+
+                    b.HasIndex("PokemonSpecialId");
+
+                    b.ToTable("CardPokemonPokemonSpecials", "data");
+                });
 
             modelBuilder.Entity("PokemonAttackCost", b =>
                 {
@@ -34,10 +63,10 @@ namespace TCGPocketDex.Api.Migrations
 
                     b.HasIndex("PokemonTypeId");
 
-                    b.ToTable("PokemonAttackCosts", "preprod");
+                    b.ToTable("PokemonAttackCosts", "data");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.Card", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.Card", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -45,118 +74,39 @@ namespace TCGPocketDex.Api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CardCollectionId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("CardRarityId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("CardSetId")
+                    b.Property<int>("CardTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CollectionNumber")
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
 
-                    b.Property<int>("Kind")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<int?>("SerieNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Specials")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CardCollectionId");
 
                     b.HasIndex("CardRarityId");
 
-                    b.HasIndex("CardSetId");
+                    b.HasIndex("CardTypeId");
 
-                    b.ToTable("Cards", "preprod");
+                    b.ToTable("Card", "data");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardFossil", b =>
-                {
-                    b.Property<int>("CardId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Hp")
-                        .HasColumnType("integer");
-
-                    b.HasKey("CardId");
-
-                    b.ToTable("CardFossils", "preprod");
-                });
-
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardItem", b =>
-                {
-                    b.Property<int>("CardId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("CardId");
-
-                    b.ToTable("CardItems", "preprod");
-                });
-
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardPokemon", b =>
-                {
-                    b.Property<int>("CardId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Hp")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("PokemonAbilityId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RetreatCost")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Specials")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Stage")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TypeId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("WeaknessTypeId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("CardId");
-
-                    b.HasIndex("PokemonAbilityId");
-
-                    b.HasIndex("TypeId");
-
-                    b.HasIndex("WeaknessTypeId");
-
-                    b.ToTable("CardPokemons", "preprod");
-                });
-
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardRarity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CardRarities", "preprod");
-                });
-
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardSet", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardCollection", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -181,10 +131,10 @@ namespace TCGPocketDex.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CardSets", "preprod");
+                    b.ToTable("CardCollection", "data");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardSetTranslation", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardCollectionTranslation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -192,7 +142,7 @@ namespace TCGPocketDex.Api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CardSetId")
+                    b.Property<int>("CardCollectionId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Culture")
@@ -207,32 +157,186 @@ namespace TCGPocketDex.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CardSetId");
+                    b.HasIndex("CardCollectionId");
 
-                    b.ToTable("CardSetTranslations", "preprod");
+                    b.ToTable("CardCollectionTranslation", "translation");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardSupporter", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardFossil", b =>
+                {
+                    b.Property<int>("CardId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Hp")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CardId");
+
+                    b.ToTable("CardFossil", "data");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardItem", b =>
                 {
                     b.Property<int>("CardId")
                         .HasColumnType("integer");
 
                     b.HasKey("CardId");
 
-                    b.ToTable("CardSupporters", "preprod");
+                    b.ToTable("CardItem", "data");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardTool", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardPokemon", b =>
+                {
+                    b.Property<int>("CardId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Hp")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PokemonAbilityId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PokemonStageId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PokemonTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RetreatCost")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("WeaknessPokemonTypeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CardId");
+
+                    b.HasIndex("PokemonAbilityId");
+
+                    b.HasIndex("PokemonStageId");
+
+                    b.HasIndex("PokemonTypeId");
+
+                    b.HasIndex("WeaknessPokemonTypeId");
+
+                    b.ToTable("CardPokemon", "data");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardRarity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CardRarity", "ref");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardRarityTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CardRarityId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Culture")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CardRarityId");
+
+                    b.ToTable("CardRarityTranslation", "translation");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardSpecial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("CardSpecial", "ref");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardSpecialTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CardSpecialId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Culture")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CardSpecialId");
+
+                    b.ToTable("CardSpecialTranslation", "translation");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardSupporter", b =>
                 {
                     b.Property<int>("CardId")
                         .HasColumnType("integer");
 
                     b.HasKey("CardId");
 
-                    b.ToTable("CardTools", "preprod");
+                    b.ToTable("CardSupporter", "data");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardTranslation", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardTool", b =>
+                {
+                    b.Property<int>("CardId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CardId");
+
+                    b.ToTable("CardTool", "data");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardTranslation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -261,10 +365,59 @@ namespace TCGPocketDex.Api.Migrations
 
                     b.HasIndex("CardId");
 
-                    b.ToTable("CardTranslations", "preprod");
+                    b.ToTable("CardTranslation", "translation");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.PokemonAbility", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("CardType", "ref");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardTypeTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CardTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Culture")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CardTypeId");
+
+                    b.ToTable("CardTypeTranslation", "translation");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonAbility", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -279,10 +432,10 @@ namespace TCGPocketDex.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PokemonAbilities", "preprod");
+                    b.ToTable("PokemonAbility", "data");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.PokemonAbilityTranslation", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonAbilityTranslation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -307,10 +460,10 @@ namespace TCGPocketDex.Api.Migrations
 
                     b.HasIndex("PokemonAbilityId");
 
-                    b.ToTable("PokemonAbilityTranslations", "preprod");
+                    b.ToTable("PokemonAbilityTranslation", "translation");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.PokemonAttack", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonAttack", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -337,10 +490,10 @@ namespace TCGPocketDex.Api.Migrations
 
                     b.HasIndex("CardPokemonCardId");
 
-                    b.ToTable("PokemonAttacks", "preprod");
+                    b.ToTable("PokemonAttack", "data");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.PokemonAttackTranslation", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonAttackTranslation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -369,10 +522,10 @@ namespace TCGPocketDex.Api.Migrations
 
                     b.HasIndex("PokemonAttackId");
 
-                    b.ToTable("PokemonAttackTranslations", "preprod");
+                    b.ToTable("PokemonAttackTranslation", "translation");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.PokemonType", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonSpecial", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -387,10 +540,105 @@ namespace TCGPocketDex.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PokemonTypes", "preprod");
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("PokemonSpecial", "ref");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.PokemonTypeTranslation", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonSpecialTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Culture")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<int>("PokemonSpecialId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PokemonSpecialId");
+
+                    b.ToTable("PokemonSpecialTranslation", "translation");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonStage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PokemonStage", "ref");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonStageTranslation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Culture")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<int>("PokemonStageId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PokemonStageId");
+
+                    b.ToTable("PokemonStageTranslation", "translation");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PokemonType", "ref");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonTypeTranslation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -415,133 +663,202 @@ namespace TCGPocketDex.Api.Migrations
 
                     b.HasIndex("PokemonTypeId");
 
-                    b.ToTable("PokemonTypeTranslations", "preprod");
+                    b.ToTable("PokemonTypeTranslation", "translation");
+                });
+
+            modelBuilder.Entity("CardCardSpecial", b =>
+                {
+                    b.HasOne("TCGPocketDex.Api.Entities.Card", null)
+                        .WithMany()
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TCGPocketDex.Api.Entities.CardSpecial", null)
+                        .WithMany()
+                        .HasForeignKey("CardSpecialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CardPokemonPokemonSpecial", b =>
+                {
+                    b.HasOne("TCGPocketDex.Api.Entities.CardPokemon", null)
+                        .WithMany()
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TCGPocketDex.Api.Entities.PokemonSpecial", null)
+                        .WithMany()
+                        .HasForeignKey("PokemonSpecialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("PokemonAttackCost", b =>
                 {
-                    b.HasOne("TCGPocketDex.Api.Entity.PokemonAttack", null)
+                    b.HasOne("TCGPocketDex.Api.Entities.PokemonAttack", null)
                         .WithMany()
                         .HasForeignKey("PokemonAttackId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TCGPocketDex.Api.Entity.PokemonType", null)
+                    b.HasOne("TCGPocketDex.Api.Entities.PokemonType", null)
                         .WithMany()
                         .HasForeignKey("PokemonTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.Card", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.Card", b =>
                 {
-                    b.HasOne("TCGPocketDex.Api.Entity.CardRarity", "Rarity")
+                    b.HasOne("TCGPocketDex.Api.Entities.CardCollection", "Collection")
+                        .WithMany("Cards")
+                        .HasForeignKey("CardCollectionId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.HasOne("TCGPocketDex.Api.Entities.CardRarity", "Rarity")
                         .WithMany()
                         .HasForeignKey("CardRarityId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TCGPocketDex.Api.Entity.CardSet", "CardSet")
-                        .WithMany("Cards")
-                        .HasForeignKey("CardSetId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                    b.HasOne("TCGPocketDex.Api.Entities.CardType", "Type")
+                        .WithMany()
+                        .HasForeignKey("CardTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("CardSet");
+                    b.Navigation("Collection");
 
                     b.Navigation("Rarity");
+
+                    b.Navigation("Type");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardFossil", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardCollectionTranslation", b =>
                 {
-                    b.HasOne("TCGPocketDex.Api.Entity.Card", "Card")
+                    b.HasOne("TCGPocketDex.Api.Entities.CardCollection", "Collection")
+                        .WithMany("Translations")
+                        .HasForeignKey("CardCollectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Collection");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardFossil", b =>
+                {
+                    b.HasOne("TCGPocketDex.Api.Entities.Card", "Card")
                         .WithOne("Fossil")
-                        .HasForeignKey("TCGPocketDex.Api.Entity.CardFossil", "CardId")
+                        .HasForeignKey("TCGPocketDex.Api.Entities.CardFossil", "CardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Card");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardItem", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardItem", b =>
                 {
-                    b.HasOne("TCGPocketDex.Api.Entity.Card", "Card")
+                    b.HasOne("TCGPocketDex.Api.Entities.Card", "Card")
                         .WithOne("Item")
-                        .HasForeignKey("TCGPocketDex.Api.Entity.CardItem", "CardId")
+                        .HasForeignKey("TCGPocketDex.Api.Entities.CardItem", "CardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Card");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardPokemon", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardPokemon", b =>
                 {
-                    b.HasOne("TCGPocketDex.Api.Entity.Card", "Card")
+                    b.HasOne("TCGPocketDex.Api.Entities.Card", "Card")
                         .WithOne("Pokemon")
-                        .HasForeignKey("TCGPocketDex.Api.Entity.CardPokemon", "CardId")
+                        .HasForeignKey("TCGPocketDex.Api.Entities.CardPokemon", "CardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TCGPocketDex.Api.Entity.PokemonAbility", "Ability")
+                    b.HasOne("TCGPocketDex.Api.Entities.PokemonAbility", "Ability")
                         .WithMany()
                         .HasForeignKey("PokemonAbilityId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("TCGPocketDex.Api.Entity.PokemonType", "Type")
+                    b.HasOne("TCGPocketDex.Api.Entities.PokemonStage", "Stage")
                         .WithMany()
-                        .HasForeignKey("TypeId")
+                        .HasForeignKey("PokemonStageId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TCGPocketDex.Api.Entity.PokemonType", "Weakness")
+                    b.HasOne("TCGPocketDex.Api.Entities.PokemonType", "Type")
                         .WithMany()
-                        .HasForeignKey("WeaknessTypeId")
+                        .HasForeignKey("PokemonTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TCGPocketDex.Api.Entities.PokemonType", "Weakness")
+                        .WithMany()
+                        .HasForeignKey("WeaknessPokemonTypeId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Ability");
 
                     b.Navigation("Card");
 
+                    b.Navigation("Stage");
+
                     b.Navigation("Type");
 
                     b.Navigation("Weakness");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardSetTranslation", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardRarityTranslation", b =>
                 {
-                    b.HasOne("TCGPocketDex.Api.Entity.CardSet", "CardSet")
+                    b.HasOne("TCGPocketDex.Api.Entities.CardRarity", "CardRarity")
                         .WithMany("Translations")
-                        .HasForeignKey("CardSetId")
+                        .HasForeignKey("CardRarityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CardSet");
+                    b.Navigation("CardRarity");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardSupporter", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardSpecialTranslation", b =>
                 {
-                    b.HasOne("TCGPocketDex.Api.Entity.Card", "Card")
+                    b.HasOne("TCGPocketDex.Api.Entities.CardSpecial", "CardSpecial")
+                        .WithMany("Translations")
+                        .HasForeignKey("CardSpecialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CardSpecial");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardSupporter", b =>
+                {
+                    b.HasOne("TCGPocketDex.Api.Entities.Card", "Card")
                         .WithOne("Supporter")
-                        .HasForeignKey("TCGPocketDex.Api.Entity.CardSupporter", "CardId")
+                        .HasForeignKey("TCGPocketDex.Api.Entities.CardSupporter", "CardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Card");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardTool", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardTool", b =>
                 {
-                    b.HasOne("TCGPocketDex.Api.Entity.Card", "Card")
+                    b.HasOne("TCGPocketDex.Api.Entities.Card", "Card")
                         .WithOne("Tool")
-                        .HasForeignKey("TCGPocketDex.Api.Entity.CardTool", "CardId")
+                        .HasForeignKey("TCGPocketDex.Api.Entities.CardTool", "CardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Card");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardTranslation", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardTranslation", b =>
                 {
-                    b.HasOne("TCGPocketDex.Api.Entity.Card", "Card")
+                    b.HasOne("TCGPocketDex.Api.Entities.Card", "Card")
                         .WithMany("Translations")
                         .HasForeignKey("CardId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -550,9 +867,20 @@ namespace TCGPocketDex.Api.Migrations
                     b.Navigation("Card");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.PokemonAbilityTranslation", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardTypeTranslation", b =>
                 {
-                    b.HasOne("TCGPocketDex.Api.Entity.PokemonAbility", "PokemonAbility")
+                    b.HasOne("TCGPocketDex.Api.Entities.CardType", "CardType")
+                        .WithMany("Translations")
+                        .HasForeignKey("CardTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CardType");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonAbilityTranslation", b =>
+                {
+                    b.HasOne("TCGPocketDex.Api.Entities.PokemonAbility", "PokemonAbility")
                         .WithMany("Translations")
                         .HasForeignKey("PokemonAbilityId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -561,16 +889,16 @@ namespace TCGPocketDex.Api.Migrations
                     b.Navigation("PokemonAbility");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.PokemonAttack", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonAttack", b =>
                 {
-                    b.HasOne("TCGPocketDex.Api.Entity.CardPokemon", null)
+                    b.HasOne("TCGPocketDex.Api.Entities.CardPokemon", null)
                         .WithMany("Attacks")
                         .HasForeignKey("CardPokemonCardId");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.PokemonAttackTranslation", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonAttackTranslation", b =>
                 {
-                    b.HasOne("TCGPocketDex.Api.Entity.PokemonAttack", "PokemonAttack")
+                    b.HasOne("TCGPocketDex.Api.Entities.PokemonAttack", "PokemonAttack")
                         .WithMany("Translations")
                         .HasForeignKey("PokemonAttackId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -579,9 +907,31 @@ namespace TCGPocketDex.Api.Migrations
                     b.Navigation("PokemonAttack");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.PokemonTypeTranslation", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonSpecialTranslation", b =>
                 {
-                    b.HasOne("TCGPocketDex.Api.Entity.PokemonType", "PokemonType")
+                    b.HasOne("TCGPocketDex.Api.Entities.PokemonSpecial", "PokemonSpecial")
+                        .WithMany("Translations")
+                        .HasForeignKey("PokemonSpecialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PokemonSpecial");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonStageTranslation", b =>
+                {
+                    b.HasOne("TCGPocketDex.Api.Entities.PokemonStage", "PokemonStage")
+                        .WithMany("Translations")
+                        .HasForeignKey("PokemonStageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PokemonStage");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonTypeTranslation", b =>
+                {
+                    b.HasOne("TCGPocketDex.Api.Entities.PokemonType", "PokemonType")
                         .WithMany("Translations")
                         .HasForeignKey("PokemonTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -590,7 +940,7 @@ namespace TCGPocketDex.Api.Migrations
                     b.Navigation("PokemonType");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.Card", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.Card", b =>
                 {
                     b.Navigation("Fossil");
 
@@ -605,29 +955,54 @@ namespace TCGPocketDex.Api.Migrations
                     b.Navigation("Translations");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardPokemon", b =>
-                {
-                    b.Navigation("Attacks");
-                });
-
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.CardSet", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardCollection", b =>
                 {
                     b.Navigation("Cards");
 
                     b.Navigation("Translations");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.PokemonAbility", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardPokemon", b =>
+                {
+                    b.Navigation("Attacks");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardRarity", b =>
                 {
                     b.Navigation("Translations");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.PokemonAttack", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardSpecial", b =>
                 {
                     b.Navigation("Translations");
                 });
 
-            modelBuilder.Entity("TCGPocketDex.Api.Entity.PokemonType", b =>
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.CardType", b =>
+                {
+                    b.Navigation("Translations");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonAbility", b =>
+                {
+                    b.Navigation("Translations");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonAttack", b =>
+                {
+                    b.Navigation("Translations");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonSpecial", b =>
+                {
+                    b.Navigation("Translations");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonStage", b =>
+                {
+                    b.Navigation("Translations");
+                });
+
+            modelBuilder.Entity("TCGPocketDex.Api.Entities.PokemonType", b =>
                 {
                     b.Navigation("Translations");
                 });

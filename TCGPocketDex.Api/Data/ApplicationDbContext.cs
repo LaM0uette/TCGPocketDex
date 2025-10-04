@@ -1,13 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TCGPocketDex.Api.Entity;
+using TCGPocketDex.Api.Entities;
 
 namespace TCGPocketDex.Api.Data;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IConfiguration configuration) : DbContext(options)
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
     #region Statements
 
-    private readonly string _schema = configuration.GetValue<string>("Schema") ?? "public";
+    private const string _schemaData = "data";
+    private const string _schemaRef = "ref";
+    private const string _schemaTranslation = "translation";
 
     #endregion
 
@@ -15,9 +17,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<Card> Cards => Set<Card>();
     public DbSet<CardTranslation> CardTranslations => Set<CardTranslation>();
-    public DbSet<CardSet> CardSets => Set<CardSet>();
-    public DbSet<CardSetTranslation> CardSetTranslations => Set<CardSetTranslation>();
+    public DbSet<CardCollection> CardSets => Set<CardCollection>();
+    public DbSet<CardCollectionTranslation> CardSetTranslations => Set<CardCollectionTranslation>();
     public DbSet<CardRarity> CardRarities => Set<CardRarity>();
+    public DbSet<CardRarityTranslation> CardRarityTranslations => Set<CardRarityTranslation>();
+
+    public DbSet<CardType> CardTypes => Set<CardType>();
+    public DbSet<CardTypeTranslation> CardTypeTranslations => Set<CardTypeTranslation>();
+    public DbSet<CardSpecial> CardSpecials => Set<CardSpecial>();
+    public DbSet<CardSpecialTranslation> CardSpecialTranslations => Set<CardSpecialTranslation>();
 
     public DbSet<CardPokemon> CardPokemons => Set<CardPokemon>();
     public DbSet<CardSupporter> CardSupporters => Set<CardSupporter>();
@@ -25,6 +33,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<CardItem> CardItems => Set<CardItem>();
     public DbSet<CardTool> CardTools => Set<CardTool>();
 
+    public DbSet<PokemonStage> PokemonStages => Set<PokemonStage>();
+    public DbSet<PokemonStageTranslation> PokemonStageTranslations => Set<PokemonStageTranslation>();
+
+    public DbSet<PokemonSpecial> PokemonSpecials => Set<PokemonSpecial>();
+    public DbSet<PokemonSpecialTranslation> PokemonSpecialTranslations => Set<PokemonSpecialTranslation>();
     public DbSet<PokemonType> PokemonTypes => Set<PokemonType>();
     public DbSet<PokemonTypeTranslation> PokemonTypeTranslations => Set<PokemonTypeTranslation>();
     public DbSet<PokemonAbility> PokemonAbilities => Set<PokemonAbility>();
@@ -40,7 +53,36 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.HasDefaultSchema(_schema);
+        // Map entities to specific schemas
+        modelBuilder.Entity<Card>().ToTable(nameof(Card), _schemaData);
+        modelBuilder.Entity<CardTranslation>().ToTable(nameof(CardTranslation), _schemaTranslation);
+        modelBuilder.Entity<CardCollection>().ToTable(nameof(CardCollection), _schemaData);
+        modelBuilder.Entity<CardCollectionTranslation>().ToTable(nameof(CardCollectionTranslation), _schemaTranslation);
+        modelBuilder.Entity<CardRarity>().ToTable(nameof(CardRarity), _schemaRef);
+        modelBuilder.Entity<CardRarityTranslation>().ToTable(nameof(CardRarityTranslation), _schemaTranslation);
+
+        modelBuilder.Entity<CardType>().ToTable(nameof(CardType), _schemaRef);
+        modelBuilder.Entity<CardTypeTranslation>().ToTable(nameof(CardTypeTranslation), _schemaTranslation);
+        modelBuilder.Entity<CardSpecial>().ToTable(nameof(CardSpecial), _schemaRef);
+        modelBuilder.Entity<CardSpecialTranslation>().ToTable(nameof(CardSpecialTranslation), _schemaTranslation);
+
+        modelBuilder.Entity<CardPokemon>().ToTable(nameof(CardPokemon), _schemaData);
+        modelBuilder.Entity<CardSupporter>().ToTable(nameof(CardSupporter), _schemaData);
+        modelBuilder.Entity<CardFossil>().ToTable(nameof(CardFossil), _schemaData);
+        modelBuilder.Entity<CardItem>().ToTable(nameof(CardItem), _schemaData);
+        modelBuilder.Entity<CardTool>().ToTable(nameof(CardTool), _schemaData);
+
+        modelBuilder.Entity<PokemonStage>().ToTable(nameof(PokemonStage), _schemaRef);
+        modelBuilder.Entity<PokemonStageTranslation>().ToTable(nameof(PokemonStageTranslation), _schemaTranslation);
+
+        modelBuilder.Entity<PokemonSpecial>().ToTable(nameof(PokemonSpecial), _schemaRef);
+        modelBuilder.Entity<PokemonSpecialTranslation>().ToTable(nameof(PokemonSpecialTranslation), _schemaTranslation);
+        modelBuilder.Entity<PokemonType>().ToTable(nameof(PokemonType), _schemaRef);
+        modelBuilder.Entity<PokemonTypeTranslation>().ToTable(nameof(PokemonTypeTranslation), _schemaTranslation);
+        modelBuilder.Entity<PokemonAbility>().ToTable(nameof(PokemonAbility), _schemaData);
+        modelBuilder.Entity<PokemonAbilityTranslation>().ToTable(nameof(PokemonAbilityTranslation), _schemaTranslation);
+        modelBuilder.Entity<PokemonAttack>().ToTable(nameof(PokemonAttack), _schemaData);
+        modelBuilder.Entity<PokemonAttackTranslation>().ToTable(nameof(PokemonAttackTranslation), _schemaTranslation);
 
         // Card -> Rarity (required)
         modelBuilder.Entity<Card>()
@@ -49,11 +91,18 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasForeignKey(c => c.CardRarityId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Card -> Type (required)
+        modelBuilder.Entity<Card>()
+            .HasOne(c => c.Type)
+            .WithMany()
+            .HasForeignKey(c => c.CardTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // Card -> CardSet (optional)
         modelBuilder.Entity<Card>()
-            .HasOne(c => c.CardSet)
+            .HasOne(c => c.Collection)
             .WithMany(s => s.Cards)
-            .HasForeignKey(c => c.CardSetId)
+            .HasForeignKey(c => c.CardCollectionId)
             .OnDelete(DeleteBehavior.SetNull);
 
         // Card -> Translations
@@ -64,10 +113,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .OnDelete(DeleteBehavior.Cascade);
 
         // CardSet -> Translations
-        modelBuilder.Entity<CardSetTranslation>()
-            .HasOne(t => t.CardSet)
+        modelBuilder.Entity<CardCollectionTranslation>()
+            .HasOne(t => t.Collection)
             .WithMany(s => s.Translations)
-            .HasForeignKey(t => t.CardSetId)
+            .HasForeignKey(t => t.CardCollectionId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Shared PK one-to-one subtypes
@@ -112,18 +161,22 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .OnDelete(DeleteBehavior.Cascade);
 
         // CardPokemon relationships
-        // Stage is now an enum; no relationship configuration needed
+        modelBuilder.Entity<CardPokemon>()
+            .HasOne(p => p.Stage)
+            .WithMany()
+            .HasForeignKey(p => p.PokemonStageId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<CardPokemon>()
             .HasOne(p => p.Type)
             .WithMany()
-            .HasForeignKey(p => p.TypeId)
+            .HasForeignKey(p => p.PokemonTypeId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<CardPokemon>()
             .HasOne(p => p.Weakness)
             .WithMany()
-            .HasForeignKey(p => p.WeaknessTypeId)
+            .HasForeignKey(p => p.WeaknessPokemonTypeId)
             .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<CardPokemon>()
@@ -146,11 +199,46 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasForeignKey(t => t.PokemonAbilityId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // PokemonStage translations
+        modelBuilder.Entity<PokemonStageTranslation>()
+            .HasOne(t => t.PokemonStage)
+            .WithMany(s => s.Translations)
+            .HasForeignKey(t => t.PokemonStageId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         // PokemonType translations
         modelBuilder.Entity<PokemonTypeTranslation>()
             .HasOne(t => t.PokemonType)
             .WithMany(tn => tn.Translations)
             .HasForeignKey(t => t.PokemonTypeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // PokemonSpecial translations
+        modelBuilder.Entity<PokemonSpecialTranslation>()
+            .HasOne(t => t.PokemonSpecial)
+            .WithMany(s => s.Translations)
+            .HasForeignKey(t => t.PokemonSpecialId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // CardType translations
+        modelBuilder.Entity<CardTypeTranslation>()
+            .HasOne(t => t.CardType)
+            .WithMany(ct => ct.Translations)
+            .HasForeignKey(t => t.CardTypeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // CardRarity translations
+        modelBuilder.Entity<CardRarityTranslation>()
+            .HasOne(t => t.CardRarity)
+            .WithMany(r => r.Translations)
+            .HasForeignKey(t => t.CardRarityId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // CardSpecial translations
+        modelBuilder.Entity<CardSpecialTranslation>()
+            .HasOne(t => t.CardSpecial)
+            .WithMany(s => s.Translations)
+            .HasForeignKey(t => t.CardSpecialId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Many-to-many: PokemonAttack.Costs <-> PokemonType
@@ -161,8 +249,35 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 "PokemonAttackCost",
                 right => right.HasOne<PokemonType>().WithMany().HasForeignKey("PokemonTypeId").OnDelete(DeleteBehavior.Cascade),
                 left => left.HasOne<PokemonAttack>().WithMany().HasForeignKey("PokemonAttackId").OnDelete(DeleteBehavior.Cascade),
-                join => join.ToTable("PokemonAttackCosts", _schema)
+                join => join.ToTable("PokemonAttackCosts", _schemaData)
             );
+
+        // Many-to-many: Card.Specials <-> CardSpecial
+        modelBuilder.Entity<Card>()
+            .HasMany(c => c.Specials)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+                "CardCardSpecial",
+                right => right.HasOne<CardSpecial>().WithMany().HasForeignKey("CardSpecialId").OnDelete(DeleteBehavior.Cascade),
+                left => left.HasOne<Card>().WithMany().HasForeignKey("CardId").OnDelete(DeleteBehavior.Cascade),
+                join => join.ToTable("CardCardSpecials", _schemaData)
+            );
+
+        // Many-to-many: CardPokemon.Specials <-> PokemonSpecial
+        modelBuilder.Entity<CardPokemon>()
+            .HasMany(p => p.Specials)
+            .WithMany()
+            .UsingEntity<Dictionary<string, object>>(
+                "CardPokemonPokemonSpecial",
+                right => right.HasOne<PokemonSpecial>().WithMany().HasForeignKey("PokemonSpecialId").OnDelete(DeleteBehavior.Cascade),
+                left => left.HasOne<CardPokemon>().WithMany().HasForeignKey("CardId").OnDelete(DeleteBehavior.Cascade),
+                join => join.ToTable("CardPokemonPokemonSpecials", _schemaData)
+            );
+
+        // Unique indexes on lookup names
+        modelBuilder.Entity<CardType>().HasIndex(x => x.Name).IsUnique();
+        modelBuilder.Entity<CardSpecial>().HasIndex(x => x.Name).IsUnique();
+        modelBuilder.Entity<PokemonSpecial>().HasIndex(x => x.Name).IsUnique();
     }
 
     #endregion

@@ -1,7 +1,0 @@
-﻿namespace TCGPocketDex.Api.Entity;
-
-public class CardSupporter
-{
-    public int CardId { get; set; }
-    public required Card Card { get; set; }
-}

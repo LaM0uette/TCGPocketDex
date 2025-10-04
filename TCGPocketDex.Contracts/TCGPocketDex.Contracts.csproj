@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\TCGPocketDex.Domain\TCGPocketDex.Domain.csproj" />
+    </ItemGroup>
+
 </Project>

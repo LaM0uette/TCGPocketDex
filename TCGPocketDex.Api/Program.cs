@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TCGPocketDex.Api.Data;
+using TCGPocketDex.Api.Endpoints;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +21,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddAuthorization();
 
 // DI registrations
 builder.Services.AddScoped<TCGPocketDex.Api.Repositories.ICardRepository, TCGPocketDex.Api.Repositories.CardRepository>();
@@ -51,12 +51,9 @@ app.UseCors("AppPolicy");
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
 app.UseStaticFiles();
 
-// Endpoints for creating cards (moved to dedicated file)
-TCGPocketDex.Api.Endpoints.CardsEndpoints.MapCardEndpoints(app);
-// Endpoints for translations
-TCGPocketDex.Api.Endpoints.TranslationsEndpoints.MapTranslationEndpoints(app);
+app.MapCardEndpoints();
+app.MapTranslationEndpoints();
 
 app.Run();

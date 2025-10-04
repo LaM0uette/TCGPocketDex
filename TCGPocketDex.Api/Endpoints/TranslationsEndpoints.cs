@@ -8,23 +8,29 @@ public static class TranslationsEndpoints
 {
     public static IEndpointRouteBuilder MapTranslationEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/cards/{cardId:int}/translations");
+        RouteGroupBuilder group = app.MapGroup("/cards/{cardId:int}/translations");
 
-        group.MapPost("", async ([FromRoute] int cardId, [FromBody] CardTranslationInputDTO dto, ICardService service, CancellationToken ct) =>
-        {
-            try
-            {
-                var result = await service.AddCardTranslationAsync(cardId, dto, ct);
-                return Results.Created($"/cards/{cardId}/translations/{result.Id}", result);
-            }
-            catch (ArgumentException ex)
-            {
-                return Results.BadRequest(new { error = ex.Message });
-            }
-        })
+        group.MapPost("", AddCardTranslationAsync)
         .WithName("AddCardTranslation")
         .WithOpenApi();
 
         return app;
+    }
+
+    private static async Task<IResult> AddCardTranslationAsync(
+        [FromRoute] int cardId,
+        [FromBody] CardTranslationInputDTO dto,
+        ICardService service,
+        CancellationToken ct)
+    {
+        try
+        {
+            await service.AddCardTranslationAsync(cardId, dto, ct);
+            return Results.Created($"/cards/{cardId}/translations", null);
+        }
+        catch (ArgumentException ex)
+        {
+            return Results.BadRequest(new { error = ex.Message });
+        }
     }
 }
