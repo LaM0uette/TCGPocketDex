@@ -44,7 +44,7 @@ public static class CardMappings
             Type = new CardTypeOutputDTO { Name = typeName },
             Name = name,
             Description = description,
-            ImageUrl = $"https://localhost:7057/img/cards/{normalized}/{card.Collection.Code}-{card.CollectionNumber}.webp", // TODO: Move to config
+            ImageUrl = $"https://tcgp-dex.com/{normalized}/{card.Collection.Code}-{card.CollectionNumber}.webp", // TODO: Move to config
             Specials = card.Specials.Select(s =>
             {
                 string sName = s.Name;
