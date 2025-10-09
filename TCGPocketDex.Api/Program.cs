@@ -8,6 +8,7 @@ string[] allowedOrigins =
 [
     "http://localhost:5277",
     "https://localhost:7164",
+    "https://localhost:7184",
     "https://0.0.0.1"
 ];
 
