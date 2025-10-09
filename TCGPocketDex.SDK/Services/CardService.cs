@@ -47,13 +47,22 @@ public class CardService : ICardService
         
         return card;
     }
-
-    public async Task<List<Card>> GetByBatchAsync(DeckRequest deck, string? cultureOverride = null, CancellationToken ct = default)
+    
+    public async Task<Card?> GetCardByRequestAsync(CardRequest request, string? cultureOverride = null, CancellationToken ct = default)
     {
         string culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
         string urlParams = $"?lng={cultureOverride ?? culture}";
 
-        List<CardOutputDTO> dtos = await _apiClient.PostAsync<List<CardOutputDTO>>($"/cards/batch{urlParams}", deck, ct);
+        CardOutputDTO? dto = await _apiClient.GetAsync<CardOutputDTO?>($"/cards/card{urlParams}", request, ct);
+        return dto?.ToCard();
+    }
+
+    public async Task<List<Card>> GetCardsByRequestAsync(CardsRequest cards, string? cultureOverride = null, CancellationToken ct = default)
+    {
+        string culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+        string urlParams = $"?lng={cultureOverride ?? culture}";
+
+        List<CardOutputDTO> dtos = await _apiClient.PostAsync<List<CardOutputDTO>>($"/cards/cards{urlParams}", cards, ct);
         return dtos.ToCards();
     }
 

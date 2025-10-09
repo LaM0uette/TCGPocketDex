@@ -48,6 +48,23 @@ public class ApiClient : IApiClient, IDisposable
         return deserialize ?? throw new JsonException("Deserialization returned null.");
     }
 
+    public async Task<T> GetAsync<T>(string path, object? body, CancellationToken cancellationToken = default)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, path)
+        {
+            Content = body is null
+                ? null
+                : new StringContent(JsonSerializer.Serialize(body, _jsonOptions), Encoding.UTF8, "application/json")
+        };
+
+        using HttpResponseMessage response = await _http.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+
+        string json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        T? deserialize = JsonSerializer.Deserialize<T>(json, _jsonOptions);
+        return deserialize ?? throw new JsonException("Deserialization returned null.");
+    }
+
     #endregion
 
     #region IDisposable

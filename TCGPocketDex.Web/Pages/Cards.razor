@@ -53,7 +53,7 @@ else
         {
             //_cards = await CardService.GetAllAsync(Culture);
 
-            DeckRequest request = new(
+            CardsRequest request = new(
                 [
                     new CardRequest("A1", 1),
                     new CardRequest("A1", 1),
@@ -63,7 +63,7 @@ else
                 ]
             );
 
-            List<Card> batch = await CardService.GetByBatchAsync(request);
+            List<Card> batch = await CardService.GetCardsByRequestAsync(request);
             Console.WriteLine($"Fetched {batch.Count} cards in batch.");
         }
         catch (Exception ex)

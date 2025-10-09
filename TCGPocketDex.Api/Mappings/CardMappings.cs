@@ -5,7 +5,12 @@ namespace TCGPocketDex.Api.Mappings;
 
 public static class CardMappings
 {
-    public static CardOutputDTO ToOutputDTOWithCulture(this Card card, string culture)
+    public static List<CardOutputDTO> ToDTOs(this IEnumerable<Card> cards, string culture = "en")
+    {
+        return cards.Select(c => c.ToDTO(culture)).ToList();
+    }
+    
+    public static CardOutputDTO ToDTO(this Card card, string culture = "en")
     {
         CardTranslation? cardTranslation = card.Translations.FirstOrDefault(ct => string.Equals(ct.Culture, culture));
         CardTypeTranslation? cardTypeTranslation = card.Type.Translations.FirstOrDefault(ctt => string.Equals(ctt.Culture, culture));
@@ -16,27 +21,15 @@ public static class CardMappings
         CardTypeOutputDTO type = new(card.Type.Id, cardTypeTranslation?.Name ?? card.Type.Name);
         string name = cardTranslation?.Name ?? card.Name;
         string description = cardTranslation?.Description ?? card.Description ?? string.Empty;
-        string imageUrl = $"/{culture}/{card.Collection.Code}-{card.CollectionNumber}.webp"; // https://tcgp-dex.com/cards
+        string imageUrl = $"/{culture}/{card.Collection.Code}-{card.CollectionNumber}.webp"; // full path example: https://tcgp-dex.com/cards/en/A1-1.webp
         List<CardSpecialOutputDTO> specials = card.GetSpecialsWithCulture(culture);
         CardRarityOutputDTO rarity = new(card.Rarity.Id, cardRarityTranslation?.Name ?? card.Rarity.Name, []);
         CardCollectionOutputDTO collection = new(card.Collection.Id, card.Collection.Code, card.Collection.Series, cardCollectionTranslation?.Name ?? card.Collection.Name);
         int collectionNumber = card.CollectionNumber;
         
-        CardOutputDTO dto = new(
-            id,
-            type,
-            name,
-            description,
-            imageUrl,
-            specials,
-            rarity,
-            collection,
-            collectionNumber
-        );
-        
-        return dto;
+        return new CardOutputDTO(id, type, name, description, imageUrl, specials, rarity, collection, collectionNumber);
     }
-
+    
     
     private static List<CardSpecialOutputDTO> GetSpecialsWithCulture(this Card card, string culture)
     {
