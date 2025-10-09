@@ -21,7 +21,7 @@ public static class CardMappings
         CardTypeOutputDTO type = new(card.Type.Id, cardTypeTranslation?.Name ?? card.Type.Name);
         string name = cardTranslation?.Name ?? card.Name;
         string description = cardTranslation?.Description ?? card.Description ?? string.Empty;
-        string imageUrl = $"/{culture}/{card.Collection.Code}-{card.CollectionNumber}.webp"; // full path example: https://tcgp-dex.com/cards/en/A1-1.webp
+        string imageUrl = $"https://tcgp-dex.com/cards/{culture}/{card.Collection.Code}-{card.CollectionNumber}.webp"; // full path example: https://tcgp-dex.com/cards/en/A1-1.webp
         List<CardSpecialOutputDTO> specials = card.GetSpecialsWithCulture(culture);
         CardRarityOutputDTO rarity = new(card.Rarity.Id, cardRarityTranslation?.Name ?? card.Rarity.Name, []);
         CardCollectionOutputDTO collection = new(card.Collection.Id, card.Collection.Code, card.Collection.Series, cardCollectionTranslation?.Name ?? card.Collection.Name);
