@@ -1,10 +1,8 @@
 ﻿namespace TCGPocketDex.Contracts.DTO;
 
-public class PokemonAttackInputDTO
-{
-    public int Damage { get; set; }
-    public required string Name { get; set; }
-    public string? Description { get; set; }
-
-    public List<int> Costs { get; set; } = [];
-}
+public record PokemonAttackInputDTO(
+    int Damage,
+    string Name,
+    string? Description,
+    List<int> Costs
+);

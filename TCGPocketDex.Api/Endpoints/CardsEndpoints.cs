@@ -110,15 +110,11 @@ public static class CardsEndpoints
 
         List<Card> cards = await db.Cards
             .AsNoTracking()
-            .Include(c => c.Type).ThenInclude(t => t.Translations)
-            .Include(c => c.Rarity).ThenInclude(r => r.Translations)
-            .Include(c => c.Collection).ThenInclude(s => s.Translations)
-            .Include(c => c.Specials).ThenInclude(s => s.Translations)
-            .Include(c => c.Translations)
+            .AsSplitQuery()
+            .WithAllIncludes()
             .ToListAsync(ct);
         
         List<CardOutputDTO> dtos = cards.Select(c => c.ToOutputDTOWithCulture(resolvedCulture)).ToList();
-        
         return Results.Ok(dtos);
     }
 
@@ -128,11 +124,8 @@ public static class CardsEndpoints
 
         Card? card = await db.Cards
             .AsNoTracking()
-            .Include(c => c.Type).ThenInclude(t => t.Translations)
-            .Include(c => c.Rarity).ThenInclude(r => r.Translations)
-            .Include(c => c.Collection).ThenInclude(s => s.Translations)
-            .Include(c => c.Specials).ThenInclude(s => s.Translations)
-            .Include(c => c.Translations)
+            .AsSplitQuery()
+            .WithAllIncludes()
             .FirstOrDefaultAsync(c => c.Id == id, ct);
         if (card is null)
             return Results.NotFound();
@@ -147,11 +140,8 @@ public static class CardsEndpoints
 
         Card? card = await db.Cards
             .AsNoTracking()
-            .Include(c => c.Type).ThenInclude(t => t.Translations)
-            .Include(c => c.Rarity).ThenInclude(r => r.Translations)
-            .Include(c => c.Collection).ThenInclude(s => s.Translations)
-            .Include(c => c.Specials).ThenInclude(s => s.Translations)
-            .Include(c => c.Translations)
+            .AsSplitQuery()
+            .WithAllIncludes()
             .FirstOrDefaultAsync(c => c.Collection.Code == collectionCode && c.CollectionNumber == collectionNumber, ct);
         
         if (card is null)
@@ -181,12 +171,9 @@ public static class CardsEndpoints
         // Fetch candidate cards with necessary includes
         List<Card> candidates = await db.Cards
             .AsNoTracking()
-            .Include(c => c.Type).ThenInclude(t => t.Translations)
-            .Include(c => c.Rarity).ThenInclude(r => r.Translations)
-            .Include(c => c.Collection).ThenInclude(s => s.Translations)
-            .Include(c => c.Specials).ThenInclude(s => s.Translations)
-            .Include(c => c.Translations)
-            .Where(c => targetCodes.Contains(c.Collection.Code))
+            .AsSplitQuery()
+            .WithAllIncludes()
+            .Where(c => targetCodes.Contains(c.Collection.Code)).Include(card => card.Collection)
             .ToListAsync(ct);
 
         // Index fetched cards by (CollectionCode, CollectionNumber)
@@ -216,10 +203,13 @@ public static class CardsEndpoints
     {
         if (http.Request.Query.TryGetValue("lng", out StringValues lngVals))
         {
-            string? lng = NormalizeCulture(lngVals.ToString());
+            string culture = lngVals.ToString();
             
-            if (!string.IsNullOrEmpty(lng))
-                return lng;
+            if (string.IsNullOrWhiteSpace(culture)) 
+                return "en";
+            
+            string trimmed = culture.Trim();
+            return trimmed.Length >= 2 ? trimmed[..2].ToLowerInvariant() : trimmed.ToLowerInvariant();
         }
         
         string accept = http.Request.Headers.AcceptLanguage.ToString();
@@ -229,15 +219,15 @@ public static class CardsEndpoints
         
         return "en";
     }
-
-    private static string? NormalizeCulture(string? culture)
+    
+    private static IQueryable<Card> WithAllIncludes(this IQueryable<Card> query)
     {
-        if (string.IsNullOrWhiteSpace(culture)) 
-            return null;
-        
-        string trimmed = culture.Trim();
-        
-        return trimmed.Length >= 2 ? trimmed[..2].ToLowerInvariant() : trimmed.ToLowerInvariant();
+        return query
+            .Include(c => c.Type).ThenInclude(t => t.Translations)
+            .Include(c => c.Rarity).ThenInclude(r => r.Translations)
+            .Include(c => c.Collection).ThenInclude(s => s.Translations)
+            .Include(c => c.Specials).ThenInclude(s => s.Translations)
+            .Include(c => c.Translations);
     }
 
     #endregion
