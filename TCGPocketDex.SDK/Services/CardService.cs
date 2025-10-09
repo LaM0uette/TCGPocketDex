@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using TCGPocketDex.Contracts.DTO;
+using TCGPocketDex.Contracts.Request;
 using TCGPocketDex.Domain.Models;
 using TCGPocketDex.SDK.Http;
 using TCGPocketDex.SDK.Mappings;
@@ -45,6 +46,15 @@ public class CardService : ICardService
         Card card = dto.ToCard();
         
         return card;
+    }
+
+    public async Task<List<Card>> GetByBatchAsync(DeckRequest deck, string? cultureOverride = null, CancellationToken ct = default)
+    {
+        string culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+        string urlParams = $"?lng={cultureOverride ?? culture}";
+
+        List<CardOutputDTO> dtos = await _apiClient.PostAsync<List<CardOutputDTO>>($"/cards/batch{urlParams}", deck, ct);
+        return dtos.ToCards();
     }
 
     #endregion

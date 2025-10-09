@@ -5,6 +5,7 @@ using TCGPocketDex.Api.Entities;
 using TCGPocketDex.Api.Mappings;
 using TCGPocketDex.Api.Services;
 using TCGPocketDex.Contracts.DTO;
+using TCGPocketDex.Contracts.Request;
 
 namespace TCGPocketDex.Api.Endpoints;
 
@@ -24,6 +25,8 @@ public static class CardsEndpoints
         
         group.MapGet("/", GetAllCardsAsync);
         group.MapGet("/{id:int}", GetCardByIdAsync);
+        group.MapGet("/{collectionCode}/{collectionNumber:int}", GetCardByCollectionNumberAsync);
+        group.MapPost("/batch", GetCardsByBatchAsync);
         
         return app;
     }
@@ -137,7 +140,74 @@ public static class CardsEndpoints
         CardOutputDTO dto = card.ToOutputDTOWithCulture(resolvedCulture);
         return Results.Ok(dto);
     }
-    
+
+    private static async Task<IResult> GetCardByCollectionNumberAsync(string collectionCode, int collectionNumber, ApplicationDbContext db, HttpContext http, CancellationToken ct)
+    {
+        string resolvedCulture = ResolveCulture(http);
+
+        Card? card = await db.Cards
+            .AsNoTracking()
+            .Include(c => c.Type).ThenInclude(t => t.Translations)
+            .Include(c => c.Rarity).ThenInclude(r => r.Translations)
+            .Include(c => c.Collection).ThenInclude(s => s.Translations)
+            .Include(c => c.Specials).ThenInclude(s => s.Translations)
+            .Include(c => c.Translations)
+            .FirstOrDefaultAsync(c => c.Collection.Code == collectionCode && c.CollectionNumber == collectionNumber, ct);
+        
+        if (card is null)
+            return Results.NotFound();
+
+        CardOutputDTO dto = card.ToOutputDTOWithCulture(resolvedCulture);
+        return Results.Ok(dto);
+    }
+
+    private static async Task<IResult> GetCardsByBatchAsync(
+        DeckRequest deck,
+        ApplicationDbContext db,
+        HttpContext http,
+        CancellationToken ct)
+    {
+        string resolvedCulture = ResolveCulture(http);
+
+        if (deck is null || deck.Cards is null || deck.Cards.Count == 0)
+            return Results.Ok(new List<CardOutputDTO>());
+
+        // Collect target collection codes to limit DB query size
+        HashSet<string> targetCodes = deck.Cards
+            .Where(x => !string.IsNullOrWhiteSpace(x.CollectionCode))
+            .Select(x => x.CollectionCode)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        // Fetch candidate cards with necessary includes
+        List<Card> candidates = await db.Cards
+            .AsNoTracking()
+            .Include(c => c.Type).ThenInclude(t => t.Translations)
+            .Include(c => c.Rarity).ThenInclude(r => r.Translations)
+            .Include(c => c.Collection).ThenInclude(s => s.Translations)
+            .Include(c => c.Specials).ThenInclude(s => s.Translations)
+            .Include(c => c.Translations)
+            .Where(c => targetCodes.Contains(c.Collection.Code))
+            .ToListAsync(ct);
+
+        // Index fetched cards by (CollectionCode, CollectionNumber)
+        var byPair = candidates
+            .GroupBy(c => (Code: c.Collection.Code.ToLowerInvariant(), Num: c.CollectionNumber))
+            .ToDictionary(g => g.Key, g => g.First());
+
+        // Build DTOs in the same order as requested, allowing duplicates if present in request
+        List<CardOutputDTO> result = new();
+        foreach (var req in deck.Cards)
+        {
+            var key = (Code: (req.CollectionCode ?? string.Empty).ToLowerInvariant(), Num: req.CollectionNumber);
+            if (byPair.TryGetValue(key, out var card))
+            {
+                result.Add(card.ToOutputDTOWithCulture(resolvedCulture));
+            }
+        }
+
+        return Results.Ok(result);
+    }
+
     #endregion
 
     #region Methods

@@ -1,4 +1,5 @@
 ﻿@page "/cards"
+@using TCGPocketDex.Contracts.Request
 @using TCGPocketDex.SDK.Services
 @using TCGPocketDex.Domain.Models
 @inject ICardService CardService
@@ -50,7 +51,20 @@ else
     {
         try
         {
-            _cards = await CardService.GetAllAsync(Culture);
+            //_cards = await CardService.GetAllAsync(Culture);
+
+            DeckRequest request = new(
+                [
+                    new CardRequest("A1", 1),
+                    new CardRequest("A1", 1),
+                    new CardRequest("A2", 1),
+                    new CardRequest("A2", 2),
+                    new CardRequest("A1", 3),
+                ]
+            );
+
+            List<Card> batch = await CardService.GetByBatchAsync(request);
+            Console.WriteLine($"Fetched {batch.Count} cards in batch.");
         }
         catch (Exception ex)
         {

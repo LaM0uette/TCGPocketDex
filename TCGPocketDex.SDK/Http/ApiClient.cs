@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 
 namespace TCGPocketDex.SDK.Http;
 
@@ -29,6 +30,19 @@ public class ApiClient : IApiClient, IDisposable
         using HttpResponseMessage response = await _http.GetAsync(path, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
         
+        string json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        T? deserialize = JsonSerializer.Deserialize<T>(json, _jsonOptions);
+        return deserialize ?? throw new JsonException("Deserialization returned null.");
+    }
+
+    public async Task<T> PostAsync<T>(string path, object? body = null, CancellationToken cancellationToken = default)
+    {
+        using var content = body is null
+            ? null
+            : new StringContent(JsonSerializer.Serialize(body, _jsonOptions), Encoding.UTF8, "application/json");
+        using HttpResponseMessage response = await _http.PostAsync(path, content, cancellationToken).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+
         string json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         T? deserialize = JsonSerializer.Deserialize<T>(json, _jsonOptions);
         return deserialize ?? throw new JsonException("Deserialization returned null.");
