@@ -1,24 +1,24 @@
 ﻿namespace TCGPocketDex.Contracts.DTO;
 
 public record CardFossilOutputDTO(
-    int Id,
-    CardTypeOutputDTO Type,
+    // int Id,
+    // CardTypeOutputDTO Type,
     string Name,
-    string? Description,
+    // string? Description,
     string? ImageUrl,
-    List<CardSpecialOutputDTO> Specials,
-    CardRarityOutputDTO Rarity,
+    // List<CardSpecialOutputDTO> Specials,
+    // CardRarityOutputDTO Rarity,
     CardCollectionOutputDTO Collection,
-    int CollectionNumber,
-    int Hp
+    int CollectionNumber
+    // int Hp
 ) : CardOutputDTO(
-    Id,
-    Type,
+    // Id,
+    // Type,
     Name,
-    Description,
+    // Description,
     ImageUrl,
-    Specials,
-    Rarity,
+    // Specials,
+    // Rarity,
     Collection,
     CollectionNumber
 );
