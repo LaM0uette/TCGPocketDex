@@ -10,18 +10,20 @@ public static class CardMappings
         return cards.Select(c => c.ToDTO(culture)).ToList();
     }
     
-    public static CardOutputDTO ToDTO(this Card card, string culture = "en")
+    public static CardOutputDTO ToDTO(this Card card, string culture = "en", bool loadThumbnail = false)
     {
         CardTranslation? cardTranslation = card.Translations.FirstOrDefault(ct => string.Equals(ct.Culture, culture));
         CardTypeTranslation? cardTypeTranslation = card.Type.Translations.FirstOrDefault(ctt => string.Equals(ctt.Culture, culture));
         CardRarityTranslation? cardRarityTranslation = card.Rarity.Translations.FirstOrDefault(crt => string.Equals(crt.Culture, culture));
         CardCollectionTranslation? cardCollectionTranslation = card.Collection.Translations.FirstOrDefault(cct => string.Equals(cct.Culture, culture));
         
+        string thumbnailPath = loadThumbnail ? "_thumbnail" : string.Empty;
+        
         int id = card.Id;
         CardTypeOutputDTO type = new(card.Type.Id, cardTypeTranslation?.Name ?? card.Type.Name);
         string name = cardTranslation?.Name ?? card.Name;
         string description = cardTranslation?.Description ?? card.Description ?? string.Empty;
-        string imageUrl = $"https://tcgp-dex.com/cards/{culture}/{card.Collection.Code}-{card.CollectionNumber}.webp"; // full path example: https://tcgp-dex.com/cards/en/A1-1.webp
+        string imageUrl = $"https://tcgp-dex.com/cards/{culture}{thumbnailPath}/{card.Collection.Code}-{card.CollectionNumber}.webp"; // full path example: https://tcgp-dex.com/cards/en/A1-1.webp
         List<CardSpecialOutputDTO> specials = card.GetSpecialsWithCulture(culture);
         CardRarityOutputDTO rarity = new(card.Rarity.Id, cardRarityTranslation?.Name ?? card.Rarity.Name, []);
         //CardCollectionOutputDTO collection = new(card.Collection.Id, card.Collection.Code, card.Collection.Series, cardCollectionTranslation?.Name ?? card.Collection.Name);

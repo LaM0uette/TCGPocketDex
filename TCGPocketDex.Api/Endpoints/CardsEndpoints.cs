@@ -94,6 +94,7 @@ public static class CardsEndpoints
         }
         
         string resolvedCulture = ResolveCulture(http);
+        bool loadThumbnail = LoadThumbnail(http);
 
         HashSet<string> targetCodes = cardsRequest.Cards
             .Where(c => !string.IsNullOrWhiteSpace(c.CollectionCode))
@@ -117,7 +118,7 @@ public static class CardsEndpoints
             (string Code, int Num) key = (Code: cardRequest.CollectionCode.ToLowerInvariant(), Num: cardRequest.CollectionNumber);
             if (byPair.TryGetValue(key, out Card? card))
             {
-                dtos.Add(card.ToDTO(resolvedCulture));
+                dtos.Add(card.ToDTO(resolvedCulture, loadThumbnail));
             }
         }
 
@@ -147,6 +148,16 @@ public static class CardsEndpoints
             return "fr";
         
         return "en";
+    }
+    
+    private static bool LoadThumbnail(HttpContext http)
+    {
+        if (!http.Request.Query.TryGetValue("thumbnail", out StringValues thumbVals)) 
+            return false;
+        
+        string thumb = thumbVals.ToString();
+        return thumb.Equals("true", StringComparison.OrdinalIgnoreCase) || thumb.Equals("1");
+
     }
     
     private static IQueryable<Card> WithAllIncludes(this IQueryable<Card> query)
