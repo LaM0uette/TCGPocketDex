@@ -47,7 +47,7 @@ public static class CardsEndpoints
             .WithAllIncludes()
             .ToListAsync(ct);
 
-        List<CardOutputDTO> dtos = cards.ToDTOs(resolvedCulture);
+        List<CardOutputDTO> dtos = cards.ToDTOs(resolvedCulture, loadThumbnail);
         return Results.Ok(dtos);
     }
 
