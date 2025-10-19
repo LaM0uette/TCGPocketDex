@@ -5,9 +5,9 @@ namespace TCGPocketDex.Api.Mappings;
 
 public static class CardMappings
 {
-    public static List<CardOutputDTO> ToDTOs(this IEnumerable<Card> cards, string culture = "en")
+    public static List<CardOutputDTO> ToDTOs(this IEnumerable<Card> cards, string culture = "en", bool loadThumbnail = false)
     {
-        return cards.Select(c => c.ToDTO(culture)).ToList();
+        return cards.Select(c => c.ToDTO(culture, loadThumbnail)).ToList();
     }
     
     public static CardOutputDTO ToDTO(this Card card, string culture = "en", bool loadThumbnail = false)

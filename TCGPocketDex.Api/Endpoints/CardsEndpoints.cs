@@ -39,6 +39,7 @@ public static class CardsEndpoints
     private static async Task<IResult> GetAllCardsAsync(ApplicationDbContext db, HttpContext http, CancellationToken ct)
     {
         string resolvedCulture = ResolveCulture(http);
+        bool loadThumbnail = LoadThumbnail(http);
 
         List<Card> cards = await db.Cards
             .AsNoTracking()
