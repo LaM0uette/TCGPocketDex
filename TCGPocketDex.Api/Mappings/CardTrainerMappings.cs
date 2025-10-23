@@ -11,7 +11,7 @@ public static class CardTrainerMappings
     {
         return new CardFossilOutputDTO(
             // card.Id,
-            // new CardTypeOutputDTO(card.Type.Id, card.Type.Name),
+            new CardTypeOutputDTO(card.Type.Id, card.Type.Name),
             card.Name,
             // card.Description ?? string.Empty,
             null,
@@ -28,7 +28,7 @@ public static class CardTrainerMappings
     {
         return new CardItemOutputDTO(
             // card.Id,
-            // new CardTypeOutputDTO(card.Type.Id, card.Type.Name),
+            new CardTypeOutputDTO(card.Type.Id, card.Type.Name),
             card.Name,
             // card.Description ?? string.Empty,
             null,
@@ -44,7 +44,7 @@ public static class CardTrainerMappings
     {
         return new CardSupporterOutputDTO(
             // card.Id,
-            // new CardTypeOutputDTO(card.Type.Id, card.Type.Name),
+            new CardTypeOutputDTO(card.Type.Id, card.Type.Name),
             card.Name,
             // card.Description ?? string.Empty,
             null,
@@ -60,7 +60,7 @@ public static class CardTrainerMappings
     {
         return new CardToolOutputDTO(
             // card.Id,
-            // new CardTypeOutputDTO(card.Type.Id, card.Type.Name),
+            new CardTypeOutputDTO(card.Type.Id, card.Type.Name),
             card.Name,
             // card.Description ?? string.Empty,
             null,

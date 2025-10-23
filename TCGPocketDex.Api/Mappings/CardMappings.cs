@@ -31,7 +31,7 @@ public static class CardMappings
         int collectionNumber = card.CollectionNumber;
         
         //return new CardOutputDTO(id, type, name, description, imageUrl, specials, rarity, collection, collectionNumber);
-        return new CardOutputDTO(name, imageUrl, collection, collectionNumber);
+        return new CardOutputDTO(type, name, imageUrl, collection, collectionNumber);
     }
     
     

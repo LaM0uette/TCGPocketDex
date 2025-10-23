@@ -2,7 +2,7 @@
 
 public record CardFossilOutputDTO(
     // int Id,
-    // CardTypeOutputDTO Type,
+    CardTypeOutputDTO Type,
     string Name,
     // string? Description,
     string? ImageUrl,
@@ -13,7 +13,7 @@ public record CardFossilOutputDTO(
     // int Hp
 ) : CardOutputDTO(
     // Id,
-    // Type,
+    Type,
     Name,
     // Description,
     ImageUrl,

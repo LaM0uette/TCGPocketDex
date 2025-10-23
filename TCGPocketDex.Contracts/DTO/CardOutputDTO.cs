@@ -2,7 +2,7 @@
 
 public record CardOutputDTO(
     // int Id,
-    // CardTypeOutputDTO Type,
+    CardTypeOutputDTO Type,
     string Name,
     // string? Description,
     string? ImageUrl,

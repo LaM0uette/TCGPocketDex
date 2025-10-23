@@ -11,7 +11,7 @@ public static class CardPokemonMappings
     {
         return new CardPokemonOutputDTO(
             // card.Id,
-            // new CardTypeOutputDTO(card.Type.Id, card.Type.Name),
+            new CardTypeOutputDTO(card.Type.Id, card.Type.Name),
             card.Name,
             // card.Description ?? string.Empty,
             null,

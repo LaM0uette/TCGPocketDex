@@ -2,7 +2,7 @@
 
 public record CardPokemonOutputDTO(
     // int Id,
-    // CardTypeOutputDTO Type,
+    CardTypeOutputDTO Type,
     string Name,
     // string? Description,
     string? ImageUrl,
@@ -20,7 +20,7 @@ public record CardPokemonOutputDTO(
     // List<PokemonAttackOutputDTO> Attacks
 ) : CardOutputDTO(
     // Id,
-    // Type,
+    Type,
     Name,
     // Description,
     ImageUrl,

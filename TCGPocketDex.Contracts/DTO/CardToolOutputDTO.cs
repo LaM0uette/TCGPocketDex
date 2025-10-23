@@ -2,7 +2,7 @@
 
 public record CardToolOutputDTO(
     // int Id,
-    // CardTypeOutputDTO Type,
+    CardTypeOutputDTO Type,
     string Name,
     // string? Description,
     string? ImageUrl,
@@ -12,7 +12,7 @@ public record CardToolOutputDTO(
     int CollectionNumber
 ) : CardOutputDTO(
     // Id,
-    // Type,
+    Type,
     Name,
     // Description,
     ImageUrl,

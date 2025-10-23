@@ -28,6 +28,7 @@ public static class CardsEndpoints
         group.MapGet("/{id:int}", GetCardByIdAsync);
         group.MapGet("/card", GetCardByRequestAsync);
         group.MapPost("/cards", GetCardsByRequestAsync);
+        group.MapPost("/deckPokemonTypes", GetDeckPokemonTypesAsync);
         
         return app;
     }
@@ -124,6 +125,39 @@ public static class CardsEndpoints
         }
 
         return Results.Ok(dtos);
+    }
+    
+    private static async Task<IResult> GetDeckPokemonTypesAsync(
+        [FromBody] CardsRequest cardsRequest, 
+        ApplicationDbContext db, 
+        CancellationToken ct)
+    {
+        if (cardsRequest.Cards.Count == 0)
+        {
+            return Results.Ok(new List<int>());
+        }
+
+        // Construit un HashSet de "code-num"
+        var keys = cardsRequest.Cards
+            .Where(c => !string.IsNullOrWhiteSpace(c.CollectionCode))
+            .Select(c => $"{c.CollectionCode.ToLowerInvariant()}-{c.CollectionNumber}")
+            .ToHashSet();
+
+        // On interroge les CardPokemons via Card.Collection
+        var pokemons = await db.CardPokemons
+            .AsNoTracking()
+            .Include(cp => cp.Type)
+            .Include(cp => cp.Card).ThenInclude(c => c.Collection)
+            .Where(cp => keys.Contains(cp.Card.Collection.Code.ToLower() + "-" + cp.Card.CollectionNumber))
+            .ToListAsync(ct);
+
+        var typeIds = pokemons
+            .Where(p => p.Type != null)
+            .Select(p => p.Type.Id)
+            .Distinct()
+            .ToList();
+
+        return Results.Ok(typeIds);
     }
 
     #endregion
