@@ -19,11 +19,11 @@ public static class CardPokemonMappings
             // new CardRarityOutputDTO(card.Rarity.Id, card.Rarity.Name, []),
             //new CardCollectionOutputDTO(card.Collection.Id, card.Collection.Code, card.Collection.Series, card.Collection.Name),
             new CardCollectionOutputDTO(card.Collection.Code),
-            card.CollectionNumber
-            // pokemon.Specials.Select(s => new PokemonSpecialOutputDTO(s.Id, s.Name)).ToList(),
+            card.CollectionNumber,
+            pokemon.Specials.Select(s => new PokemonSpecialOutputDTO(s.Id, s.Name)).ToList(),
             // new PokemonStageOutputDTO(pokemon.Stage.Id, pokemon.Stage.Name),
             // pokemon.Hp,
-            // new PokemonTypeOutputDTO(pokemon.Type.Id, pokemon.Type.Name),
+            new PokemonTypeOutputDTO(pokemon.Type.Id, pokemon.Type.Name)
             // pokemon.Weakness is null ? null : new PokemonTypeOutputDTO(pokemon.Weakness.Id, pokemon.Weakness.Name),
             // pokemon.RetreatCost,
             // pokemon.Ability is null ? null : new PokemonAbilityOutputDTO(pokemon.Ability.Id, pokemon.Ability.Name, null),

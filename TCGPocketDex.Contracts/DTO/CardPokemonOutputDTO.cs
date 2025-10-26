@@ -9,11 +9,11 @@ public record CardPokemonOutputDTO(
     // List<CardSpecialOutputDTO> Specials,
     // CardRarityOutputDTO Rarity,
     CardCollectionOutputDTO Collection,
-    int CollectionNumber
-    // List<PokemonSpecialOutputDTO> PokemonSpecials,
+    int CollectionNumber,
+    List<PokemonSpecialOutputDTO> PokemonSpecials,
     // PokemonStageOutputDTO Stage,
     // int Hp,
-    // PokemonTypeOutputDTO PokemonType,
+    PokemonTypeOutputDTO PokemonType
     // PokemonTypeOutputDTO? Weakness,
     // int RetreatCost,
     // PokemonAbilityOutputDTO? Ability,
@@ -24,7 +24,7 @@ public record CardPokemonOutputDTO(
     Name,
     // Description,
     ImageUrl,
-    // Specials,
+    //Specials,
     // Rarity,
     Collection,
     CollectionNumber

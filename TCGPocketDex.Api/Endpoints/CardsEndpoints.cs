@@ -25,6 +25,11 @@ public static class CardsEndpoints
         group.MapPost("/supporter", CreateCardSupporterAsync);
         
         group.MapGet("/", GetAllCardsAsync);
+        group.MapGet("/pokemon", GetAllPokemonCardsAsync);
+        group.MapGet("/fossil", GetAllFossilCardsAsync);
+        group.MapGet("/item", GetAllItemCardsAsync);
+        group.MapGet("/tool", GetAllToolCardsAsync);
+        group.MapGet("/supporter", GetAllSupporterCardsAsync);
         group.MapGet("/{id:int}", GetCardByIdAsync);
         group.MapGet("/card", GetCardByRequestAsync);
         group.MapPost("/cards", GetCardsByRequestAsync);
@@ -51,6 +56,196 @@ public static class CardsEndpoints
 
         List<CardOutputDTO> dtos = cards.ToDTOs(resolvedCulture, loadThumbnail);
         return Results.Ok(dtos);
+    }
+
+
+    private static async Task<IResult> GetAllPokemonCardsAsync(ApplicationDbContext db, HttpContext http, CancellationToken ct)
+    {
+        string culture = ResolveCulture(http);
+        bool loadThumbnail = LoadThumbnail(http);
+        string thumbPath = loadThumbnail ? "_thumbnail" : string.Empty;
+
+        List<Card> cards = await db.Cards
+            .AsNoTracking()
+            .AsSplitQuery()
+            .WithAllIncludes()
+            .Include(c => c.Pokemon)!.ThenInclude(p => p!.Specials)
+            .Include(c => c.Pokemon)!.ThenInclude(p => p!.Type)
+            .Where(c => c.Rarity.Id < 5 && c.Pokemon != null)
+            .ToListAsync(ct);
+
+        List<CardPokemonOutputDTO> result = new(cards.Count);
+        foreach (Card card in cards)
+        {
+            var pokemon = card.Pokemon!;
+            CardTranslation? cardTranslation = card.Translations.FirstOrDefault(ctt => string.Equals(ctt.Culture, culture));
+            CardTypeTranslation? cardTypeTranslation = card.Type.Translations.FirstOrDefault(tt => string.Equals(tt.Culture, culture));
+            string name = cardTranslation?.Name ?? card.Name;
+            CardTypeOutputDTO typeDto = new(card.Type.Id, cardTypeTranslation?.Name ?? card.Type.Name);
+            string imageUrl = $"https://tcgp-dex.com/cards/{culture}{thumbPath}/{card.Collection.Code}-{card.CollectionNumber}.webp";
+            CardCollectionOutputDTO collection = new(card.Collection.Code);
+
+            var dto = new CardPokemonOutputDTO(
+                typeDto,
+                name,
+                imageUrl,
+                collection,
+                card.CollectionNumber,
+                pokemon.Specials.Select(s => new PokemonSpecialOutputDTO(s.Id, s.Name)).ToList(),
+                new PokemonTypeOutputDTO(pokemon.Type.Id, pokemon.Type.Name)
+            );
+            result.Add(dto);
+        }
+
+        return Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetAllFossilCardsAsync(ApplicationDbContext db, HttpContext http, CancellationToken ct)
+    {
+        string culture = ResolveCulture(http);
+        bool loadThumbnail = LoadThumbnail(http);
+        string thumbPath = loadThumbnail ? "_thumbnail" : string.Empty;
+
+        List<Card> cards = await db.Cards
+            .AsNoTracking()
+            .AsSplitQuery()
+            .WithAllIncludes()
+            .Include(c => c.Fossil)
+            .Where(c => c.Rarity.Id < 5 && c.Fossil != null)
+            .ToListAsync(ct);
+
+        List<CardFossilOutputDTO> result = new(cards.Count);
+        foreach (Card card in cards)
+        {
+            CardTranslation? cardTranslation = card.Translations.FirstOrDefault(ctt => string.Equals(ctt.Culture, culture));
+            CardTypeTranslation? cardTypeTranslation = card.Type.Translations.FirstOrDefault(tt => string.Equals(tt.Culture, culture));
+            string name = cardTranslation?.Name ?? card.Name;
+            CardTypeOutputDTO typeDto = new(card.Type.Id, cardTypeTranslation?.Name ?? card.Type.Name);
+            string imageUrl = $"https://tcgp-dex.com/cards/{culture}{thumbPath}/{card.Collection.Code}-{card.CollectionNumber}.webp";
+            CardCollectionOutputDTO collection = new(card.Collection.Code);
+
+            var dto = new CardFossilOutputDTO(
+                typeDto,
+                name,
+                imageUrl,
+                collection,
+                card.CollectionNumber
+            );
+            result.Add(dto);
+        }
+
+        return Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetAllItemCardsAsync(ApplicationDbContext db, HttpContext http, CancellationToken ct)
+    {
+        string culture = ResolveCulture(http);
+        bool loadThumbnail = LoadThumbnail(http);
+        string thumbPath = loadThumbnail ? "_thumbnail" : string.Empty;
+
+        List<Card> cards = await db.Cards
+            .AsNoTracking()
+            .AsSplitQuery()
+            .WithAllIncludes()
+            .Include(c => c.Item)
+            .Where(c => c.Rarity.Id < 5 && c.Item != null)
+            .ToListAsync(ct);
+
+        List<CardItemOutputDTO> result = new(cards.Count);
+        foreach (Card card in cards)
+        {
+            CardTranslation? cardTranslation = card.Translations.FirstOrDefault(ctt => string.Equals(ctt.Culture, culture));
+            CardTypeTranslation? cardTypeTranslation = card.Type.Translations.FirstOrDefault(tt => string.Equals(tt.Culture, culture));
+            string name = cardTranslation?.Name ?? card.Name;
+            CardTypeOutputDTO typeDto = new(card.Type.Id, cardTypeTranslation?.Name ?? card.Type.Name);
+            string imageUrl = $"https://tcgp-dex.com/cards/{culture}{thumbPath}/{card.Collection.Code}-{card.CollectionNumber}.webp";
+            CardCollectionOutputDTO collection = new(card.Collection.Code);
+
+            var dto = new CardItemOutputDTO(
+                typeDto,
+                name,
+                imageUrl,
+                collection,
+                card.CollectionNumber
+            );
+            result.Add(dto);
+        }
+
+        return Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetAllToolCardsAsync(ApplicationDbContext db, HttpContext http, CancellationToken ct)
+    {
+        string culture = ResolveCulture(http);
+        bool loadThumbnail = LoadThumbnail(http);
+        string thumbPath = loadThumbnail ? "_thumbnail" : string.Empty;
+
+        List<Card> cards = await db.Cards
+            .AsNoTracking()
+            .AsSplitQuery()
+            .WithAllIncludes()
+            .Include(c => c.Tool)
+            .Where(c => c.Rarity.Id < 5 && c.Tool != null)
+            .ToListAsync(ct);
+
+        List<CardToolOutputDTO> result = new(cards.Count);
+        foreach (Card card in cards)
+        {
+            CardTranslation? cardTranslation = card.Translations.FirstOrDefault(ctt => string.Equals(ctt.Culture, culture));
+            CardTypeTranslation? cardTypeTranslation = card.Type.Translations.FirstOrDefault(tt => string.Equals(tt.Culture, culture));
+            string name = cardTranslation?.Name ?? card.Name;
+            CardTypeOutputDTO typeDto = new(card.Type.Id, cardTypeTranslation?.Name ?? card.Type.Name);
+            string imageUrl = $"https://tcgp-dex.com/cards/{culture}{thumbPath}/{card.Collection.Code}-{card.CollectionNumber}.webp";
+            CardCollectionOutputDTO collection = new(card.Collection.Code);
+
+            var dto = new CardToolOutputDTO(
+                typeDto,
+                name,
+                imageUrl,
+                collection,
+                card.CollectionNumber
+            );
+            result.Add(dto);
+        }
+
+        return Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetAllSupporterCardsAsync(ApplicationDbContext db, HttpContext http, CancellationToken ct)
+    {
+        string culture = ResolveCulture(http);
+        bool loadThumbnail = LoadThumbnail(http);
+        string thumbPath = loadThumbnail ? "_thumbnail" : string.Empty;
+
+        List<Card> cards = await db.Cards
+            .AsNoTracking()
+            .AsSplitQuery()
+            .WithAllIncludes()
+            .Include(c => c.Supporter)
+            .Where(c => c.Rarity.Id < 5 && c.Supporter != null)
+            .ToListAsync(ct);
+
+        List<CardSupporterOutputDTO> result = new(cards.Count);
+        foreach (Card card in cards)
+        {
+            CardTranslation? cardTranslation = card.Translations.FirstOrDefault(ctt => string.Equals(ctt.Culture, culture));
+            CardTypeTranslation? cardTypeTranslation = card.Type.Translations.FirstOrDefault(tt => string.Equals(tt.Culture, culture));
+            string name = cardTranslation?.Name ?? card.Name;
+            CardTypeOutputDTO typeDto = new(card.Type.Id, cardTypeTranslation?.Name ?? card.Type.Name);
+            string imageUrl = $"https://tcgp-dex.com/cards/{culture}{thumbPath}/{card.Collection.Code}-{card.CollectionNumber}.webp";
+            CardCollectionOutputDTO collection = new(card.Collection.Code);
+
+            var dto = new CardSupporterOutputDTO(
+                typeDto,
+                name,
+                imageUrl,
+                collection,
+                card.CollectionNumber
+            );
+            result.Add(dto);
+        }
+
+        return Results.Ok(result);
     }
 
     private static async Task<IResult> GetCardByIdAsync(int id, ApplicationDbContext db, HttpContext http, CancellationToken ct)
