@@ -46,6 +46,7 @@ public static class CardsEndpoints
             .AsNoTracking()
             .AsSplitQuery()
             .WithAllIncludes()
+            .Where(c => c.Rarity.Id < 5)
             .ToListAsync(ct);
 
         List<CardOutputDTO> dtos = cards.ToDTOs(resolvedCulture, loadThumbnail);
