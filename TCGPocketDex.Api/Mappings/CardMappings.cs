@@ -5,200 +5,52 @@ namespace TCGPocketDex.Api.Mappings;
 
 public static class CardMappings
 {
-    public static CardOutputDTO ToOutputDTO(this Card card)
+    public static List<CardOutputDTO> ToDTOs(this IEnumerable<Card> cards, string culture = "en", bool loadThumbnail = false)
     {
-        return card.ToOutputDTOWithCulture(null);
+        return cards.Select(c => c.ToDTO(culture, loadThumbnail)).ToList();
     }
-
-    public static CardOutputDTO ToOutputDTOWithCulture(this Card card, string? culture)
+    
+    public static CardOutputDTO ToDTO(this Card card, string culture = "en", bool loadThumbnail = false)
     {
-        string? normalized = NormalizeCulture(culture);
-
-        string name = card.Name;
-        string description = card.Description ?? string.Empty;
-        var tr = normalized is null ? null : card.Translations.FirstOrDefault(t => string.Equals(t.Culture, normalized, StringComparison.OrdinalIgnoreCase));
-        if (tr is not null)
-        {
-            name = tr.Name;
-            description = tr.Description ?? description;
-        }
-
-        string typeName = card.Type.Name;
-        var typeTr = normalized is null ? null : card.Type.Translations.FirstOrDefault(t => string.Equals(t.Culture, normalized, StringComparison.OrdinalIgnoreCase));
-        if (typeTr is not null)
-            typeName = typeTr.Name;
-
-        string rarityName = card.Rarity.Name;
-        var rarityTr = normalized is null ? null : card.Rarity.Translations.FirstOrDefault(t => string.Equals(t.Culture, normalized, StringComparison.OrdinalIgnoreCase));
-        if (rarityTr is not null)
-            rarityName = rarityTr.Name;
-
-        string collectionName = card.Collection.Name;
-        var collectionTr = normalized is null ? null : card.Collection.Translations.FirstOrDefault(t => string.Equals(t.Culture, normalized, StringComparison.OrdinalIgnoreCase));
-        if (collectionTr is not null)
-            collectionName = collectionTr.Name;
-
-        return new CardOutputDTO
-        {
-            Id = card.Id,
-            Type = new CardTypeOutputDTO { Name = typeName },
-            Name = name,
-            Description = description,
-            ImageUrl = $"https://tcgp-dex.com/{normalized}/{card.Collection.Code}-{card.CollectionNumber}.webp", // TODO: Move to config
-            Specials = card.Specials.Select(s =>
-            {
-                string sName = s.Name;
-                var sTr = normalized is null ? null : s.Translations.FirstOrDefault(t => string.Equals(t.Culture, normalized, StringComparison.OrdinalIgnoreCase));
-                if (sTr is not null) sName = sTr.Name;
-                return new CardSpecialOutputDTO { Name = sName };
-            }).ToList(),
-            Rarity = new CardRarityOutputDTO { Name = rarityName },
-            Collection = new CardCollectionOutputDTO { Code = card.Collection.Code, Series = card.Collection.Series, Name = collectionName },
-            CollectionNumber = card.CollectionNumber,
-            Translations = card.Translations.Select(t => new CardTranslationOutputDTO
-            {
-                Id = t.Id,
-                Culture = t.Culture,
-                Name = t.Name,
-                Description = t.Description ?? string.Empty
-            }).ToList()
-        };
+        CardTranslation? cardTranslation = card.Translations.FirstOrDefault(ct => string.Equals(ct.Culture, culture));
+        CardTypeTranslation? cardTypeTranslation = card.Type.Translations.FirstOrDefault(ctt => string.Equals(ctt.Culture, culture));
+        CardRarityTranslation? cardRarityTranslation = card.Rarity.Translations.FirstOrDefault(crt => string.Equals(crt.Culture, culture));
+        CardCollectionTranslation? cardCollectionTranslation = card.Collection.Translations.FirstOrDefault(cct => string.Equals(cct.Culture, culture));
+        
+        string thumbnailPath = loadThumbnail ? "_thumbnail" : string.Empty;
+        
+        int id = card.Id;
+        CardTypeOutputDTO type = new(card.Type.Id, cardTypeTranslation?.Name ?? card.Type.Name);
+        string name = cardTranslation?.Name ?? card.Name;
+        string description = cardTranslation?.Description ?? card.Description ?? string.Empty;
+        string imageUrl = $"https://tcgp-dex.com/cards/{culture}{thumbnailPath}/{card.Collection.Code}-{card.CollectionNumber}.webp"; // full path example: https://tcgp-dex.com/cards/en/A1-1.webp
+        List<CardSpecialOutputDTO> specials = card.GetSpecialsWithCulture(culture);
+        CardRarityOutputDTO rarity = new(card.Rarity.Id, cardRarityTranslation?.Name ?? card.Rarity.Name, []);
+        //CardCollectionOutputDTO collection = new(card.Collection.Id, card.Collection.Code, card.Collection.Series, cardCollectionTranslation?.Name ?? card.Collection.Name);
+        CardCollectionOutputDTO collection = new(card.Collection.Code);
+        int collectionNumber = card.CollectionNumber;
+        
+        //return new CardOutputDTO(id, type, name, description, imageUrl, specials, rarity, collection, collectionNumber);
+        return new CardOutputDTO(type, name, imageUrl, collection, collectionNumber);
     }
-
-    private static string? NormalizeCulture(string? culture)
+    
+    
+    private static List<CardSpecialOutputDTO> GetSpecialsWithCulture(this Card card, string culture)
     {
-        if (string.IsNullOrWhiteSpace(culture)) return null;
-        // keep two-letter lower-case when possible (e.g., fr, en)
-        var trimmed = culture.Trim();
-        if (trimmed.Length >= 2)
-            return trimmed[..2].ToLowerInvariant();
-        return trimmed.ToLowerInvariant();
+        return card.Specials.Select(cs => new CardSpecialOutputDTO(
+            cs.Id,
+            cs.Translations.FirstOrDefault(cst => cst.Culture == culture)?.Name ?? cs.Name,
+            []
+        )).ToList();
     }
+    
+    
+    
+    
 
-    public static CardPokemonOutputDTO ToPokemonOutputDTO(this Card card, CardPokemon pokemon)
-    {
-        return new CardPokemonOutputDTO
-        {
-            Id = card.Id,
-            Type = new CardTypeOutputDTO { Name = card.Type.Name },
-            Name = card.Name,
-            Description = card.Description ?? string.Empty,
-            Specials = card.Specials.Select(s => new CardSpecialOutputDTO { Name = s.Name }).ToList(),
-            Rarity = new CardRarityOutputDTO { Name = card.Rarity.Name },
-            Collection = new CardCollectionOutputDTO { Code = card.Collection.Code, Series = card.Collection.Series, Name = card.Collection.Name },
-            CollectionNumber = card.CollectionNumber,
-            Translations = card.Translations.Select(t => new CardTranslationOutputDTO
-            {
-                Id = t.Id,
-                Culture = t.Culture,
-                Name = t.Name,
-                Description = t.Description ?? string.Empty
-            }).ToList(),
+    #region ToRemove // TODO: Remove
 
-            PokemonSpecials = pokemon.Specials.Select(s => new PokemonSpecialOutputDTO { Name = s.Name }).ToList(),
-            Stage = new PokemonStageOutputDTO { Name = pokemon.Stage.Name },
-            Hp = pokemon.Hp,
-            PokemonType = new PokemonTypeOutputDTO { Id = pokemon.Type.Id, Name = pokemon.Type.Name },
-            Weakness = pokemon.Weakness is null ? null : new PokemonTypeOutputDTO { Id = pokemon.Weakness.Id, Name = pokemon.Weakness.Name },
-            RetreatCost = pokemon.RetreatCost,
-            Ability = pokemon.Ability is null ? null : new PokemonAbilityOutputDTO { Id = pokemon.Ability.Id, Name = pokemon.Ability.Name },
-            Attacks = pokemon.Attacks.Select(a => new PokemonAttackOutputDTO
-            {
-                Id = a.Id,
-                Damage = a.Damage,
-                Name = a.Name,
-                Description = a.Description ?? string.Empty,
-                Costs = a.Costs.Select(c => new PokemonTypeOutputDTO { Id = c.Id, Name = c.Name }).ToList()
-            }).ToList()
-        };
-    }
+    // Methods moved to dedicated mapping classes: CardPokemonMappings and CardTrainerMappings
 
-    public static CardFossilOutputDTO ToFossilOutputDTO(this Card card, CardFossil fossil)
-    {
-        return new CardFossilOutputDTO
-        {
-            Id = card.Id,
-            Type = new CardTypeOutputDTO { Name = card.Type.Name },
-            Name = card.Name,
-            Description = card.Description ?? string.Empty,
-            Specials = card.Specials.Select(s => new CardSpecialOutputDTO { Name = s.Name }).ToList(),
-            Rarity = new CardRarityOutputDTO { Name = card.Rarity.Name },
-            Collection = new CardCollectionOutputDTO { Code = card.Collection.Code, Series = card.Collection.Series, Name = card.Collection.Name },
-            CollectionNumber = card.CollectionNumber,
-            Translations = card.Translations.Select(t => new CardTranslationOutputDTO
-            {
-                Id = t.Id,
-                Culture = t.Culture,
-                Name = t.Name,
-                Description = t.Description ?? string.Empty
-            }).ToList(),
-            Hp = fossil.Hp
-        };
-    }
-
-    public static CardItemOutputDTO ToItemOutputDTO(this Card card, CardItem item)
-    {
-        return new CardItemOutputDTO
-        {
-            Id = card.Id,
-            Type = new CardTypeOutputDTO { Name = card.Type.Name },
-            Name = card.Name,
-            Description = card.Description ?? string.Empty,
-            Specials = card.Specials.Select(s => new CardSpecialOutputDTO { Name = s.Name }).ToList(),
-            Rarity = new CardRarityOutputDTO { Name = card.Rarity.Name },
-            Collection = new CardCollectionOutputDTO { Code = card.Collection.Code, Series = card.Collection.Series, Name = card.Collection.Name },
-            CollectionNumber = card.CollectionNumber,
-            Translations = card.Translations.Select(t => new CardTranslationOutputDTO
-            {
-                Id = t.Id,
-                Culture = t.Culture,
-                Name = t.Name,
-                Description = t.Description ?? string.Empty
-            }).ToList(),
-        };
-    }
-
-    public static CardSupporterOutputDTO ToSupporterOutputDTO(this Card card, CardSupporter supporter)
-    {
-        return new CardSupporterOutputDTO
-        {
-            Id = card.Id,
-            Type = new CardTypeOutputDTO { Name = card.Type.Name },
-            Name = card.Name,
-            Description = card.Description ?? string.Empty,
-            Specials = card.Specials.Select(s => new CardSpecialOutputDTO { Name = s.Name }).ToList(),
-            Rarity = new CardRarityOutputDTO { Name = card.Rarity.Name },
-            Collection = new CardCollectionOutputDTO { Code = card.Collection.Code, Series = card.Collection.Series, Name = card.Collection.Name },
-            CollectionNumber = card.CollectionNumber,
-            Translations = card.Translations.Select(t => new CardTranslationOutputDTO
-            {
-                Id = t.Id,
-                Culture = t.Culture,
-                Name = t.Name,
-                Description = t.Description ?? string.Empty
-            }).ToList(),
-        };
-    }
-
-    public static CardToolOutputDTO ToToolOutputDTO(this Card card, CardTool tool)
-    {
-        return new CardToolOutputDTO
-        {
-            Id = card.Id,
-            Type = new CardTypeOutputDTO { Name = card.Type.Name },
-            Name = card.Name,
-            Description = card.Description ?? string.Empty,
-            Specials = card.Specials.Select(s => new CardSpecialOutputDTO { Name = s.Name }).ToList(),
-            Rarity = new CardRarityOutputDTO { Name = card.Rarity.Name },
-            Collection = new CardCollectionOutputDTO { Code = card.Collection.Code, Series = card.Collection.Series, Name = card.Collection.Name },
-            CollectionNumber = card.CollectionNumber,
-            Translations = card.Translations.Select(t => new CardTranslationOutputDTO
-            {
-                Id = t.Id,
-                Culture = t.Culture,
-                Name = t.Name,
-                Description = t.Description ?? string.Empty
-            }).ToList(),
-        };
-    }
+    #endregion
 }

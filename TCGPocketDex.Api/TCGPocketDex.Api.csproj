@@ -19,7 +19,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TCGPocketDex.Contracts\TCGPocketDex.Contracts.csproj" />
-    <ProjectReference Include="..\TCGPocketDex.Domain\TCGPocketDex.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\FakeData\" />
   </ItemGroup>
 
 </Project>

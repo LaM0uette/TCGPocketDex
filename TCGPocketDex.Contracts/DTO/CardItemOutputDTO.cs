@@ -1,5 +1,23 @@
 ﻿namespace TCGPocketDex.Contracts.DTO;
 
-public class CardItemOutputDTO : CardOutputDTO
-{
-}
+public record CardItemOutputDTO(
+    // int Id,
+    CardTypeOutputDTO Type,
+    string Name,
+    // string? Description,
+    string? ImageUrl,
+    // List<CardSpecialOutputDTO> Specials,
+    // CardRarityOutputDTO Rarity,
+    CardCollectionOutputDTO Collection,
+    int CollectionNumber
+) : CardOutputDTO(
+    // Id,
+    Type,
+    Name,
+    // Description,
+    ImageUrl,
+    // Specials,
+    // Rarity,
+    Collection,
+    CollectionNumber
+);

@@ -16,3 +16,4 @@ public class CardTranslationOutputDTO
     [JsonPropertyName("description")]
     public string? Description { get; set; }
 }
+
