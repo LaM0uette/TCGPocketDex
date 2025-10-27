@@ -113,4 +113,9 @@ app.UseStaticFiles();
 app.MapCardEndpoints();
 app.MapTranslationEndpoints();
 
+foreach (Endpoint endpoint in app.Services.GetRequiredService<EndpointDataSource>().Endpoints)
+{
+    Console.WriteLine($"Endpoint: {endpoint.DisplayName}");
+}
+
 app.Run();
