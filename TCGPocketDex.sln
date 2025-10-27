@@ -1,14 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCGPocketDex.SDK", "TCGPocketDex.SDK\TCGPocketDex.SDK.csproj", "{86D5DEF3-E517-4B55-A62F-37A29340E296}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCGPocketDex.Contracts", "TCGPocketDex.Contracts\TCGPocketDex.Contracts.csproj", "{CC6D6B4E-2749-49FB-BD77-42B50A6802E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCGPocketDex.Web", "TCGPocketDex.Web\TCGPocketDex.Web.csproj", "{06565FF2-9EF1-4F67-84AF-B972A7A45D23}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCGPocketDex.Api", "TCGPocketDex.Api\TCGPocketDex.Api.csproj", "{5AE48CA9-B31C-4A2E-AC10-E644F350BF0A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCGPocketDex.Domain", "TCGPocketDex.Domain\TCGPocketDex.Domain.csproj", "{96B49C97-E524-40A5-8EBC-8934EEA80909}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,25 +10,13 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{86D5DEF3-E517-4B55-A62F-37A29340E296}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{86D5DEF3-E517-4B55-A62F-37A29340E296}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{86D5DEF3-E517-4B55-A62F-37A29340E296}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{86D5DEF3-E517-4B55-A62F-37A29340E296}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CC6D6B4E-2749-49FB-BD77-42B50A6802E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CC6D6B4E-2749-49FB-BD77-42B50A6802E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC6D6B4E-2749-49FB-BD77-42B50A6802E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC6D6B4E-2749-49FB-BD77-42B50A6802E3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{06565FF2-9EF1-4F67-84AF-B972A7A45D23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{06565FF2-9EF1-4F67-84AF-B972A7A45D23}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{06565FF2-9EF1-4F67-84AF-B972A7A45D23}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{06565FF2-9EF1-4F67-84AF-B972A7A45D23}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5AE48CA9-B31C-4A2E-AC10-E644F350BF0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5AE48CA9-B31C-4A2E-AC10-E644F350BF0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AE48CA9-B31C-4A2E-AC10-E644F350BF0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AE48CA9-B31C-4A2E-AC10-E644F350BF0A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{96B49C97-E524-40A5-8EBC-8934EEA80909}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{96B49C97-E524-40A5-8EBC-8934EEA80909}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{96B49C97-E524-40A5-8EBC-8934EEA80909}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{96B49C97-E524-40A5-8EBC-8934EEA80909}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
