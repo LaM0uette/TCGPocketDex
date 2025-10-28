@@ -11,7 +11,9 @@ string[] allowedOrigins =
     "http://localhost:5277",
     "https://localhost:7164",
     "https://localhost:7184",
-    "https://0.0.0.1"
+    "https://0.0.0.1",
+    "https://app.preprod.tehleadersheep.com",
+    "https://app.tehleadersheep.com",
 ];
 
 
@@ -113,10 +115,5 @@ app.UseStaticFiles();
 
 app.MapCardEndpoints();
 app.MapTranslationEndpoints();
-
-foreach (Endpoint endpoint in app.Services.GetRequiredService<EndpointDataSource>().Endpoints)
-{
-    Console.WriteLine($"Endpoint: {endpoint.DisplayName}");
-}
 
 app.Run();
