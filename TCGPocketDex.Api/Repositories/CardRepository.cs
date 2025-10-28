@@ -50,7 +50,7 @@ public class CardRepository(ApplicationDbContext db) : ICardRepository
 
     public Task SaveChangesAsync(CancellationToken ct = default) => db.SaveChangesAsync(ct);
 
-    public Task<PokemonType?> FindPokemonTypeAsync(int id, CancellationToken ct = default) => db.PokemonTypes.FirstOrDefaultAsync(t => t.Id == id, ct);
+    public Task<PokemonType?> FindPokemonTypeAsync(int id, CancellationToken ct = default) => db.PokemonTypes.AsTracking().FirstOrDefaultAsync(t => t.Id == id, ct);
     public Task<PokemonStage?> FindPokemonStageAsync(int id, CancellationToken ct = default) => db.PokemonStages.FirstOrDefaultAsync(s => s.Id == id, ct);
     public Task<PokemonAbility?> FindPokemonAbilityAsync(int id, CancellationToken ct = default) => db.PokemonAbilities.FirstOrDefaultAsync(a => a.Id == id, ct);
     public Task<CardRarity?> FindRarityAsync(int id, CancellationToken ct = default) => db.CardRarities.FirstOrDefaultAsync(r => r.Id == id, ct);
@@ -60,10 +60,10 @@ public class CardRepository(ApplicationDbContext db) : ICardRepository
     public Task<CardType?> FindCardTypeAsync(int id, CancellationToken ct = default) => db.CardTypes.FirstOrDefaultAsync(t => t.Id == id, ct);
 
     public async Task<List<CardSpecial>> FindCardSpecialsByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default)
-        => await db.CardSpecials.Where(s => ids.Contains(s.Id)).ToListAsync(ct);
+        => await db.CardSpecials.AsTracking().Where(s => ids.Contains(s.Id)).ToListAsync(ct);
 
     public async Task<List<PokemonSpecial>> FindPokemonSpecialsByIdsAsync(IEnumerable<int> ids, CancellationToken ct = default)
-        => await db.PokemonSpecials.Where(s => ids.Contains(s.Id)).ToListAsync(ct);
+        => await db.PokemonSpecials.AsTracking().Where(s => ids.Contains(s.Id)).ToListAsync(ct);
 
     public Task<CardSpecial?> FindCardSpecialByNameAsync(string name, CancellationToken ct = default)
         => db.CardSpecials.FirstOrDefaultAsync(s => s.Name == name, ct);

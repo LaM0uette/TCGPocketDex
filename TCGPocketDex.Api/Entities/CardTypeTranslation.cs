@@ -7,7 +7,7 @@ public class CardTypeTranslation
     public int Id { get; init; }
 
     public int CardTypeId { get; set; }
-    public required CardType CardType { get; set; }
+    public CardType? CardType { get; set; }
 
     [MaxLength(10)]
     public required string Culture { get; set; }

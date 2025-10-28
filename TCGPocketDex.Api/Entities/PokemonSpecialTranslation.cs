@@ -7,7 +7,7 @@ public class PokemonSpecialTranslation
     public int Id { get; init; }
 
     public int PokemonSpecialId { get; set; }
-    public required PokemonSpecial PokemonSpecial { get; set; }
+    public PokemonSpecial? PokemonSpecial { get; set; }
 
     [MaxLength(10)]
     public required string Culture { get; set; }

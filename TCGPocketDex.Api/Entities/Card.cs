@@ -7,7 +7,7 @@ public class Card
     public int Id { get; init; }
 
     public int CardTypeId { get; set; }
-    public required CardType Type { get; set; }
+    public CardType? Type { get; set; }
     
     [MaxLength(100)]
     public required string Name { get; set; }
@@ -18,10 +18,10 @@ public class Card
     public ICollection<CardSpecial> Specials { get; set; } = [];
     
     public int CardRarityId { get; set; }
-    public required CardRarity Rarity { get; set; }
+    public CardRarity? Rarity { get; set; }
 
-    public int CardCollectionId { get; set; }
-    public required CardCollection Collection { get; set; }
+    public int? CardCollectionId { get; set; }
+    public CardCollection? Collection { get; set; }
     
     public int CollectionNumber { get; set; }
     

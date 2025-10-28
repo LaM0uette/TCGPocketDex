@@ -7,7 +7,7 @@ public class CardRarityTranslation
     public int Id { get; init; }
 
     public int CardRarityId { get; set; }
-    public required CardRarity CardRarity { get; set; }
+    public CardRarity? CardRarity { get; set; }
 
     [MaxLength(10)]
     public required string Culture { get; set; }

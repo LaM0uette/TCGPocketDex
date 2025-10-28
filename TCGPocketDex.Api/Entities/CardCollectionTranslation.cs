@@ -7,7 +7,7 @@ public class CardCollectionTranslation
     public int Id { get; init; }
 
     public int CardCollectionId { get; set; }
-    public required CardCollection Collection { get; set; }
+    public CardCollection? Collection { get; set; }
 
     [MaxLength(10)]
     public required string Culture { get; set; }

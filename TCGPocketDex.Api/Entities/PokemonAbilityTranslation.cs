@@ -7,7 +7,7 @@ public class PokemonAbilityTranslation
     public int Id { get; init; }
 
     public int PokemonAbilityId { get; set; }
-    public required PokemonAbility PokemonAbility { get; set; }
+    public PokemonAbility? PokemonAbility { get; set; }
 
     [MaxLength(10)]
     public required string Culture { get; set; }

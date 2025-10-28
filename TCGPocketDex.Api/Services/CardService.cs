@@ -39,13 +39,10 @@ public class CardService(ICardRepository repo) : ICardService
         var card = new Card
         {
             CardTypeId = pokemonTypeEntity.Id,
-            Type = pokemonTypeEntity,
             Name = dto.Name,
             Description = dto.Description ?? string.Empty,
             CardRarityId = dto.CardRarityId,
-            Rarity = rarity,
             CardCollectionId = dto.CardCollectionId,
-            Collection = set,
             CollectionNumber = dto.CollectionNumber,
         };
 
@@ -56,23 +53,21 @@ public class CardService(ICardRepository repo) : ICardService
         }
 
         await repo.AddCardAsync(card, ct);
+        // Persist the card immediately to get its generated Id for dependents
+        await repo.SaveChangesAsync(ct);
 
         var stage = await repo.FindPokemonStageAsync(dto.PokemonStageId, ct);
         if (stage is null) throw new ArgumentException($"PokemonStageId {dto.PokemonStageId} not found");
 
         var pokemon = new CardPokemon
         {
-            Card = card,
+            CardId = card.Id,
             PokemonStageId = dto.PokemonStageId,
-            Stage = stage,
             Hp = dto.Hp,
             PokemonTypeId = dto.PokemonTypeId,
-            Type = type,
             WeaknessPokemonTypeId = dto.WeaknessPokemonTypeId,
-            Weakness = weakness,
             RetreatCost = dto.RetreatCost,
             PokemonAbilityId = dto.PokemonAbilityId,
-            Ability = ability,
         };
 
         // Pokemon specials
@@ -129,13 +124,10 @@ public class CardService(ICardRepository repo) : ICardService
         var card = new Card
         {
             CardTypeId = fossilType.Id,
-            Type = fossilType,
             Name = dto.Name,
             Description = dto.Description ?? string.Empty,
             CardRarityId = dto.CardRarityId,
-            Rarity = rarity,
             CardCollectionId = dto.CardCollectionId,
-            Collection = set,
             CollectionNumber = dto.CollectionNumber,
         };
         if (dto.CardSpecialIds?.Count > 0)
@@ -143,10 +135,12 @@ public class CardService(ICardRepository repo) : ICardService
             card.Specials = await repo.FindCardSpecialsByIdsAsync(dto.CardSpecialIds, ct);
         }
         await repo.AddCardAsync(card, ct);
+        // Persist the card immediately to get its generated Id for dependents
+        await repo.SaveChangesAsync(ct);
 
         var fossil = new CardFossil
         {
-            Card = card,
+            CardId = card.Id,
             Hp = dto.Hp
         };
         await repo.AddFossilAsync(fossil, ct);
@@ -169,13 +163,10 @@ public class CardService(ICardRepository repo) : ICardService
         var card = new Card
         {
             CardTypeId = toolType.Id,
-            Type = toolType,
             Name = dto.Name,
             Description = dto.Description ?? string.Empty,
             CardRarityId = dto.CardRarityId,
-            Rarity = rarity,
             CardCollectionId = dto.CardCollectionId,
-            Collection = set,
             CollectionNumber = dto.CollectionNumber,
         };
         if (dto.CardSpecialIds?.Count > 0)
@@ -183,8 +174,10 @@ public class CardService(ICardRepository repo) : ICardService
             card.Specials = await repo.FindCardSpecialsByIdsAsync(dto.CardSpecialIds, ct);
         }
         await repo.AddCardAsync(card, ct);
+        // Persist the card immediately to get its generated Id for dependents
+        await repo.SaveChangesAsync(ct);
 
-        var tool = new CardTool { Card = card };
+        var tool = new CardTool { CardId = card.Id };
         await repo.AddToolAsync(tool, ct);
         await repo.SaveChangesAsync(ct);
 
@@ -205,18 +198,17 @@ public class CardService(ICardRepository repo) : ICardService
         var card = new Card
         {
             CardTypeId = itemType.Id,
-            Type = itemType,
             Name = dto.Name,
             Description = dto.Description ?? string.Empty,
             CardRarityId = dto.CardRarityId,
-            Rarity = rarity,
             CardCollectionId = dto.CardCollectionId,
-            Collection = set,
             CollectionNumber = dto.CollectionNumber,
         };
         await repo.AddCardAsync(card, ct);
+        // Persist the card immediately to get its generated Id for dependents
+        await repo.SaveChangesAsync(ct);
 
-        var item = new CardItem { Card = card };
+        var item = new CardItem { CardId = card.Id };
         await repo.AddItemAsync(item, ct);
         await repo.SaveChangesAsync(ct);
 
@@ -237,13 +229,10 @@ public class CardService(ICardRepository repo) : ICardService
         var card = new Card
         {
             CardTypeId = supporterType.Id,
-            Type = supporterType,
             Name = dto.Name,
             Description = dto.Description ?? string.Empty,
             CardRarityId = dto.CardRarityId,
-            Rarity = rarity,
             CardCollectionId = dto.CardCollectionId,
-            Collection = set,
             CollectionNumber = dto.CollectionNumber,
         };
         if (dto.CardSpecialIds?.Count > 0)
@@ -251,8 +240,10 @@ public class CardService(ICardRepository repo) : ICardService
             card.Specials = await repo.FindCardSpecialsByIdsAsync(dto.CardSpecialIds, ct);
         }
         await repo.AddCardAsync(card, ct);
+        // Persist the card immediately to get its generated Id for dependents
+        await repo.SaveChangesAsync(ct);
 
-        var supporter = new CardSupporter { Card = card };
+        var supporter = new CardSupporter { CardId = card.Id };
         await repo.AddSupporterAsync(supporter, ct);
         await repo.SaveChangesAsync(ct);
 
@@ -265,7 +256,6 @@ public class CardService(ICardRepository repo) : ICardService
 
         var translation = new CardTranslation
         {
-            Card = card,
             CardId = card.Id,
             Culture = dto.Culture,
             Name = dto.Name,

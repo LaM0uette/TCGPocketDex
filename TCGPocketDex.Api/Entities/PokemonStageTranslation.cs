@@ -7,7 +7,7 @@ public class PokemonStageTranslation
     public int Id { get; init; }
 
     public int PokemonStageId { get; set; }
-    public required PokemonStage PokemonStage { get; set; }
+    public PokemonStage? PokemonStage { get; set; }
 
     [MaxLength(10)]
     public required string Culture { get; set; }
