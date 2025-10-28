@@ -55,6 +55,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd ~/tcgpocketdex/api
+            docker stop api_${{ github.event.inputs.environment }} || true
+            docker rm api_${{ github.event.inputs.environment }} || true
             docker compose pull api_${{ github.event.inputs.environment }}
-            docker compose rm -sf api_${{ github.event.inputs.environment }}
             docker compose up -d api_${{ github.event.inputs.environment }}
