@@ -12,8 +12,8 @@ string[] allowedOrigins =
     "https://localhost:7164",
     "https://localhost:7184",
     "https://0.0.0.1",
-    "https://app.preprod.tehleadersheep.com",
-    "https://app.tehleadersheep.com",
+    "https://app.topdeck.preprod.tehleadersheep.com",
+    "https://app.topdeck.tehleadersheep.com",
 ];
 
 
