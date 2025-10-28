@@ -56,4 +56,5 @@ jobs:
           script: |
             cd ~/tcgpocketdex/api
             docker compose pull api_${{ github.event.inputs.environment }}
-            docker compose up -d --force-recreate --remove-orphans api_${{ github.event.inputs.environment }}
+            docker compose rm -sf api_${{ github.event.inputs.environment }}
+            docker compose up -d api_${{ github.event.inputs.environment }}
