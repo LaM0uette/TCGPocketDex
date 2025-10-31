@@ -114,18 +114,22 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseResponseCompression();
 
+app.UseRouting();
+
 //app.UseCors("AppPolicy");
 app.UseCors();
+
+app.UseAuthorization();
+
+app.UseStaticFiles();
+
+app.MapCardEndpoints();
+app.MapTranslationEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
     // Redirect root to Swagger UI so it's opened by default
     app.MapGet("/", () => Results.Redirect("/swagger"));
 }
-
-app.UseStaticFiles();
-
-app.MapCardEndpoints();
-app.MapTranslationEndpoints();
 
 app.Run();
