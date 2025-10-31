@@ -6,17 +6,6 @@ using TCGPocketDex.Api.Endpoints;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-string[] allowedOrigins =
-[
-    "http://localhost:5277",
-    "https://localhost:7164",
-    "https://localhost:7184",
-    "https://0.0.0.1",
-    "https://app.topdeck.preprod.tehleadersheep.com",
-    "https://app.topdeck.tehleadersheep.com",
-];
-
-
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
@@ -27,27 +16,6 @@ if (builder.Environment.IsDevelopment())
 }
 
 builder.Configuration.AddEnvironmentVariables();
-
-// builder.Services.AddCors(options =>
-// {
-//     options.AddPolicy("AppPolicy", policy =>
-//     {
-//         policy.WithOrigins(allowedOrigins)
-//             .AllowAnyOrigin()
-//             .AllowAnyHeader()
-//             .AllowAnyMethod();
-//     });
-// });
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
-
 
 // Brotli and Gzip compression
 builder.Services.AddResponseCompression(options =>
@@ -115,9 +83,6 @@ app.UseHttpsRedirection();
 app.UseResponseCompression();
 
 app.UseRouting();
-
-//app.UseCors("AppPolicy");
-app.UseCors();
 
 app.UseAuthorization();
 
