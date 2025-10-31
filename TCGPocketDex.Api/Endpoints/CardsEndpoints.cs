@@ -286,6 +286,12 @@ public static class CardsEndpoints
 
     private static async Task<IResult> GetCardsByRequestAsync([FromBody] CardsRequest cardsRequest, ApplicationDbContext db, HttpContext http, CancellationToken ct)
     {
+        if (cardsRequest == null)
+            return Results.BadRequest("Request body cannot be null.");
+
+        if (cardsRequest.Cards == null || cardsRequest.Cards.Count == 0)
+            return Results.BadRequest("CollectionCodes is required.");
+        
         if (cardsRequest.Cards.Count == 0)
         {
             return Results.Ok(new List<CardOutputDTO>());
