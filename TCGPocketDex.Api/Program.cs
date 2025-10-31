@@ -28,12 +28,21 @@ if (builder.Environment.IsDevelopment())
 
 builder.Configuration.AddEnvironmentVariables();
 
+// builder.Services.AddCors(options =>
+// {
+//     options.AddPolicy("AppPolicy", policy =>
+//     {
+//         policy.WithOrigins(allowedOrigins)
+//             .AllowAnyOrigin()
+//             .AllowAnyHeader()
+//             .AllowAnyMethod();
+//     });
+// });
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AppPolicy", policy =>
+    options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins(allowedOrigins)
-            .AllowAnyOrigin()
+        policy.AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -102,8 +111,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AppPolicy");
+app.UseHttpsRedirection();
 app.UseResponseCompression();
+
+//app.UseCors("AppPolicy");
+app.UseCors();
 
 if (app.Environment.IsDevelopment())
 {
@@ -111,7 +123,6 @@ if (app.Environment.IsDevelopment())
     app.MapGet("/", () => Results.Redirect("/swagger"));
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.MapCardEndpoints();
