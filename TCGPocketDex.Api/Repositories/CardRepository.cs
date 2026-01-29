@@ -42,6 +42,12 @@ public class CardRepository(ApplicationDbContext db) : ICardRepository
         return supporter;
     }
 
+    public async Task<CardStadium> AddStadiumAsync(CardStadium stadium, CancellationToken ct = default)
+    {
+        await db.CardStadiums.AddAsync(stadium, ct);
+        return stadium;
+    }
+
     public async Task<CardTranslation> AddCardTranslationAsync(CardTranslation translation, CancellationToken ct = default)
     {
         await db.CardTranslations.AddAsync(translation, ct);

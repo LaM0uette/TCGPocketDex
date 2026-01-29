@@ -250,6 +250,41 @@ public class CardService(ICardRepository repo) : ICardService
         return card.ToSupporterOutputDTO(supporter);
     }
 
+    public async Task<CardStadiumOutputDTO> CreateStadiumAsync(CardStadiumInputDTO dto, CancellationToken ct = default)
+    {
+        CardRarity? rarity = await repo.FindRarityAsync(dto.CardRarityId, ct);
+        if (rarity is null) throw new ArgumentException($"CardRarityId {dto.CardRarityId} not found");
+
+        CardCollection? set = await repo.FindSetAsync(dto.CardCollectionId, ct);
+        if (set is null) 
+                throw new ArgumentException($"CardSetId {dto.CardCollectionId} not found");
+
+        var stadiumType = await repo.FindCardTypeByNameAsync("Stadium", ct) ?? throw new ArgumentException("CardType 'Stadium' not found");
+
+        var card = new Card
+        {
+            CardTypeId = stadiumType.Id,
+            Name = dto.Name,
+            Description = dto.Description ?? string.Empty,
+            CardRarityId = dto.CardRarityId,
+            CardCollectionId = dto.CardCollectionId,
+            CollectionNumber = dto.CollectionNumber,
+        };
+        if (dto.CardSpecialIds?.Count > 0)
+        {
+            card.Specials = await repo.FindCardSpecialsByIdsAsync(dto.CardSpecialIds, ct);
+        }
+        await repo.AddCardAsync(card, ct);
+        // Persist the card immediately to get its generated Id for dependents
+        await repo.SaveChangesAsync(ct);
+
+        var stadium = new CardStadium { CardId = card.Id };
+        await repo.AddStadiumAsync(stadium, ct);
+        await repo.SaveChangesAsync(ct);
+
+        return card.ToStadiumOutputDTO(stadium);
+    }
+
     public async Task<CardTranslationOutputDTO> AddCardTranslationAsync(int cardId, CardTranslationInputDTO dto, CancellationToken ct = default)
     {
         var card = await repo.FindCardAsync(cardId, ct) ?? throw new ArgumentException($"CardId {cardId} not found");

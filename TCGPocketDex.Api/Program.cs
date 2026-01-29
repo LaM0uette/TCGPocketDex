@@ -21,7 +21,8 @@ builder.Services.AddCors(options =>
     {
         policy
             .WithOrigins(
-                "https://localhost:7184"
+                "https://localhost:7184",
+                "https://localhost:7190"
             )
             .AllowAnyHeader()
             .AllowAnyMethod()

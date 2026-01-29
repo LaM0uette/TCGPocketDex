@@ -29,6 +29,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<CardPokemon> CardPokemons => Set<CardPokemon>();
     public DbSet<CardSupporter> CardSupporters => Set<CardSupporter>();
+    public DbSet<CardStadium> CardStadiums => Set<CardStadium>();
     public DbSet<CardFossil> CardFossils => Set<CardFossil>();
     public DbSet<CardItem> CardItems => Set<CardItem>();
     public DbSet<CardTool> CardTools => Set<CardTool>();
@@ -68,6 +69,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         modelBuilder.Entity<CardPokemon>().ToTable(nameof(CardPokemon), _schemaData);
         modelBuilder.Entity<CardSupporter>().ToTable(nameof(CardSupporter), _schemaData);
+        modelBuilder.Entity<CardStadium>().ToTable(nameof(CardStadium), _schemaData);
         modelBuilder.Entity<CardFossil>().ToTable(nameof(CardFossil), _schemaData);
         modelBuilder.Entity<CardItem>().ToTable(nameof(CardItem), _schemaData);
         modelBuilder.Entity<CardTool>().ToTable(nameof(CardTool), _schemaData);
@@ -134,6 +136,14 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasOne(p => p.Card)
             .WithOne(c => c.Supporter)
             .HasForeignKey<CardSupporter>(p => p.CardId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CardStadium>()
+            .HasKey(p => p.CardId);
+        modelBuilder.Entity<CardStadium>()
+            .HasOne(p => p.Card)
+            .WithOne(c => c.Stadium)
+            .HasForeignKey<CardStadium>(p => p.CardId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<CardFossil>()

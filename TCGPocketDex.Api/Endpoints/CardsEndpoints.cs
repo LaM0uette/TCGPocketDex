@@ -23,6 +23,7 @@ public static class CardsEndpoints
         group.MapPost("/tool", CreateCardToolAsync);
         group.MapPost("/item", CreateCardItemAsync);
         group.MapPost("/supporter", CreateCardSupporterAsync);
+        group.MapPost("/stadium", CreateCardStadiumAsync);
         
         group.MapGet("/", GetAllCardsAsync);
         group.MapGet("/pokemon", GetAllPokemonCardsAsync);
@@ -30,6 +31,7 @@ public static class CardsEndpoints
         group.MapGet("/item", GetAllItemCardsAsync);
         group.MapGet("/tool", GetAllToolCardsAsync);
         group.MapGet("/supporter", GetAllSupporterCardsAsync);
+        group.MapGet("/stadium", GetAllStadiumCardsAsync);
         group.MapGet("/{id:int}", GetCardByIdAsync);
         group.MapGet("/card", GetCardByRequestAsync);
         group.MapPost("/cards", GetCardsByRequestAsync);
@@ -236,6 +238,43 @@ public static class CardsEndpoints
             CardCollectionOutputDTO collection = new(card.Collection.Code);
 
             var dto = new CardSupporterOutputDTO(
+                typeDto,
+                name,
+                imageUrl,
+                collection,
+                card.CollectionNumber
+            );
+            result.Add(dto);
+        }
+
+        return Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetAllStadiumCardsAsync(ApplicationDbContext db, HttpContext http, CancellationToken ct)
+    {
+        string culture = ResolveCulture(http);
+        bool loadThumbnail = LoadThumbnail(http);
+        string thumbPath = loadThumbnail ? "_thumbnail" : string.Empty;
+
+        List<Card> cards = await db.Cards
+            .AsNoTracking()
+            .AsSplitQuery()
+            .WithAllIncludes()
+            .Include(c => c.Stadium)
+            .Where(c => c.Rarity.Id < 5 && c.Stadium != null)
+            .ToListAsync(ct);
+
+        List<CardStadiumOutputDTO> result = new(cards.Count);
+        foreach (Card card in cards)
+        {
+            CardTranslation? cardTranslation = card.Translations.FirstOrDefault(ctt => string.Equals(ctt.Culture, culture));
+            CardTypeTranslation? cardTypeTranslation = card.Type.Translations.FirstOrDefault(tt => string.Equals(tt.Culture, culture));
+            string name = cardTranslation?.Name ?? card.Name;
+            CardTypeOutputDTO typeDto = new(card.Type.Id, cardTypeTranslation?.Name ?? card.Type.Name);
+            string imageUrl = $"https://tcgp-dex.com/cards/{culture}{thumbPath}/{card.Collection.Code}-{card.CollectionNumber}.webp";
+            CardCollectionOutputDTO collection = new(card.Collection.Code);
+
+            var dto = new CardStadiumOutputDTO(
                 typeDto,
                 name,
                 imageUrl,
@@ -471,6 +510,19 @@ public static class CardsEndpoints
         {
             await service.CreateSupporterAsync(dto, ct);
             return Results.Created($"/cards/supporter", null);
+        }
+        catch (ArgumentException ex)
+        {
+            return Results.BadRequest(new { error = ex.Message });
+        }
+    }
+
+    private static async Task<IResult> CreateCardStadiumAsync(ICardService service, CardStadiumInputDTO dto, CancellationToken ct)
+    {
+        try
+        {
+            await service.CreateStadiumAsync(dto, ct);
+            return Results.Created($"/cards/stadium", null);
         }
         catch (ArgumentException ex)
         {

@@ -50,4 +50,15 @@ public static class CardTrainerMappings
             card.CollectionNumber
         );
     }
+
+    public static CardStadiumOutputDTO ToStadiumOutputDTO(this Card card, CardStadium stadium)
+    {
+        return new CardStadiumOutputDTO(
+            new CardTypeOutputDTO(card.Type?.Id ?? card.CardTypeId, card.Type?.Name ?? string.Empty),
+            card.Name,
+            null,
+            new CardCollectionOutputDTO(card.Collection?.Code ?? string.Empty),
+            card.CollectionNumber
+        );
+    }
 }

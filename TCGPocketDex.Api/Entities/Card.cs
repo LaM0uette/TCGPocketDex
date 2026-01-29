@@ -30,6 +30,7 @@ public class Card
     public CardSupporter? Supporter { get; set; }
     public CardFossil? Fossil { get; set; }
     public CardItem? Item { get; set; }
+    public CardStadium? Stadium { get; set; }
 
     public ICollection<CardTranslation> Translations { get; set; } = [];
 }

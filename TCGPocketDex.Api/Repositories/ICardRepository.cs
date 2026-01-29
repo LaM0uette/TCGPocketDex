@@ -10,6 +10,7 @@ public interface ICardRepository
     Task<CardTool> AddToolAsync(CardTool tool, CancellationToken ct = default);
     Task<CardItem> AddItemAsync(CardItem item, CancellationToken ct = default);
     Task<CardSupporter> AddSupporterAsync(CardSupporter supporter, CancellationToken ct = default);
+    Task<CardStadium> AddStadiumAsync(CardStadium stadium, CancellationToken ct = default);
     Task<CardTranslation> AddCardTranslationAsync(CardTranslation translation, CancellationToken ct = default);
     Task SaveChangesAsync(CancellationToken ct = default);
 
