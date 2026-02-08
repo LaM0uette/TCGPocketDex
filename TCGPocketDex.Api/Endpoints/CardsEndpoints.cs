@@ -36,6 +36,7 @@ public static class CardsEndpoints
         group.MapGet("/card", GetCardByRequestAsync);
         group.MapPost("/cards", GetCardsByRequestAsync);
         group.MapPost("/deckPokemonTypes", GetDeckPokemonTypesAsync);
+        group.MapGet("/search/data", GetAllCardSearchDataAsync);
         
         return app;
     }
@@ -399,6 +400,68 @@ public static class CardsEndpoints
             .ToList();
 
         return Results.Ok(typeIds);
+    }
+
+    private static async Task<IResult> GetAllCardSearchDataAsync(ApplicationDbContext db, HttpContext http, CancellationToken ct)
+    {
+        string culture = ResolveCulture(http);
+
+        var cards = await db.Cards
+            .AsNoTracking()
+            .Include(c => c.Translations)
+            .Select(c => new
+            {
+                c.Name,
+                Translations = c.Translations.Select(t => new { t.Culture, t.Name }),
+                IsPokemon = c.Pokemon != null,
+                IsFossil = c.Fossil != null,
+                IsItem = c.Item != null,
+                IsTool = c.Tool != null,
+                IsSupporter = c.Supporter != null,
+                IsStadium = c.Stadium != null
+            })
+            .ToListAsync(ct);
+
+        List<string> pokemon = [];
+        List<string> fossil = [];
+        List<string> item = [];
+        List<string> tool = [];
+        List<string> supporter = [];
+        List<string> stadium = [];
+
+        foreach (var card in cards)
+        {
+            string nameEn = card.Name;
+            string? nameFr = card.Translations.FirstOrDefault(t => t.Culture == "fr")?.Name;
+
+            string displayName;
+            if (culture == "fr")
+            {
+                displayName = nameFr != null ? $"{nameFr} | {nameEn}" : nameEn;
+            }
+            else
+            {
+                displayName = nameFr != null ? $"{nameEn} | {nameFr}" : nameEn;
+            }
+
+            if (card.IsPokemon) pokemon.Add(displayName);
+            if (card.IsFossil) fossil.Add(displayName);
+            if (card.IsItem) item.Add(displayName);
+            if (card.IsTool) tool.Add(displayName);
+            if (card.IsSupporter) supporter.Add(displayName);
+            if (card.IsStadium) stadium.Add(displayName);
+        }
+
+        var result = new CardsSearchDataDTO(
+            pokemon.Distinct().OrderBy(s => s).ToList(),
+            fossil.Distinct().OrderBy(s => s).ToList(),
+            item.Distinct().OrderBy(s => s).ToList(),
+            tool.Distinct().OrderBy(s => s).ToList(),
+            supporter.Distinct().OrderBy(s => s).ToList(),
+            stadium.Distinct().OrderBy(s => s).ToList()
+        );
+
+        return Results.Ok(result);
     }
 
     #endregion
