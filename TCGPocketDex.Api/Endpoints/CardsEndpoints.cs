@@ -484,6 +484,8 @@ public static class CardsEndpoints
             expansions.Add(new ExpansionOutputDTO(displayName, collection.Code));
         }
 
+        expansions = [.. expansions.OrderBy(e => e.Code.Contains("P-"))];
+
         return Results.Ok(expansions);
     }
 
