@@ -37,6 +37,7 @@ public static class CardsEndpoints
         group.MapPost("/cards", GetCardsByRequestAsync);
         group.MapPost("/deckPokemonTypes", GetDeckPokemonTypesAsync);
         group.MapGet("/search/data", GetAllCardSearchDataAsync);
+        group.MapGet("/expansions", GetAllExpansionsAsync);
         
         return app;
     }
@@ -462,6 +463,28 @@ public static class CardsEndpoints
         );
 
         return Results.Ok(result);
+    }
+
+    private static async Task<IResult> GetAllExpansionsAsync(ApplicationDbContext db, HttpContext http, CancellationToken ct)
+    {
+        string culture = ResolveCulture(http);
+
+        List<CardCollection> collections = await db.CardSets
+            .AsNoTracking()
+            .Include(c => c.Translations)
+            .ToListAsync(ct);
+
+        List<ExpansionOutputDTO> expansions = [];
+
+        foreach (CardCollection collection in collections)
+        {
+            CardCollectionTranslation? translation = collection.Translations.FirstOrDefault(t => t.Culture == culture);
+            string displayName = translation?.Name ?? collection.Name;
+
+            expansions.Add(new ExpansionOutputDTO(displayName, collection.Code));
+        }
+
+        return Results.Ok(expansions);
     }
 
     #endregion
