@@ -46,6 +46,8 @@ public static class CardsEndpoints
     
     #region Read
     
+    private const string ExcludedExpansionCode = "A4b";
+    
     private static async Task<IResult> GetAllCardsAsync(ApplicationDbContext db, HttpContext http, CancellationToken ct)
     {
         string resolvedCulture = ResolveCulture(http);
@@ -55,7 +57,7 @@ public static class CardsEndpoints
             .AsNoTracking()
             .AsSplitQuery()
             .WithAllIncludes()
-            .Where(c => c.Rarity.Id < 5)
+            .Where(c => c.Rarity.Id < 5 && c.Collection.Code != ExcludedExpansionCode)
             .ToListAsync(ct);
 
         List<CardOutputDTO> dtos = cards.ToDTOs(resolvedCulture, loadThumbnail);
@@ -75,7 +77,7 @@ public static class CardsEndpoints
             .WithAllIncludes()
             .Include(c => c.Pokemon)!.ThenInclude(p => p!.Specials)
             .Include(c => c.Pokemon)!.ThenInclude(p => p!.Type)
-            .Where(c => c.Rarity.Id < 5 && c.Pokemon != null)
+            .Where(c => c.Rarity.Id < 5 && c.Pokemon != null && c.Collection.Code != ExcludedExpansionCode)
             .ToListAsync(ct);
 
         List<CardPokemonOutputDTO> result = new(cards.Count);
@@ -115,7 +117,7 @@ public static class CardsEndpoints
             .AsSplitQuery()
             .WithAllIncludes()
             .Include(c => c.Fossil)
-            .Where(c => c.Rarity.Id < 5 && c.Fossil != null)
+            .Where(c => c.Rarity.Id < 5 && c.Fossil != null && c.Collection.Code != ExcludedExpansionCode)
             .ToListAsync(ct);
 
         List<CardFossilOutputDTO> result = new(cards.Count);
@@ -152,7 +154,7 @@ public static class CardsEndpoints
             .AsSplitQuery()
             .WithAllIncludes()
             .Include(c => c.Item)
-            .Where(c => c.Rarity.Id < 5 && c.Item != null)
+            .Where(c => c.Rarity.Id < 5 && c.Item != null && c.Collection.Code != ExcludedExpansionCode)
             .ToListAsync(ct);
 
         List<CardItemOutputDTO> result = new(cards.Count);
@@ -189,7 +191,7 @@ public static class CardsEndpoints
             .AsSplitQuery()
             .WithAllIncludes()
             .Include(c => c.Tool)
-            .Where(c => c.Rarity.Id < 5 && c.Tool != null)
+            .Where(c => c.Rarity.Id < 5 && c.Tool != null && c.Collection.Code != ExcludedExpansionCode)
             .ToListAsync(ct);
 
         List<CardToolOutputDTO> result = new(cards.Count);
@@ -226,7 +228,7 @@ public static class CardsEndpoints
             .AsSplitQuery()
             .WithAllIncludes()
             .Include(c => c.Supporter)
-            .Where(c => c.Rarity.Id < 5 && c.Supporter != null)
+            .Where(c => c.Rarity.Id < 5 && c.Supporter != null && c.Collection.Code != ExcludedExpansionCode)
             .ToListAsync(ct);
 
         List<CardSupporterOutputDTO> result = new(cards.Count);
@@ -263,7 +265,7 @@ public static class CardsEndpoints
             .AsSplitQuery()
             .WithAllIncludes()
             .Include(c => c.Stadium)
-            .Where(c => c.Rarity.Id < 5 && c.Stadium != null)
+            .Where(c => c.Rarity.Id < 5 && c.Stadium != null && c.Collection.Code != ExcludedExpansionCode)
             .ToListAsync(ct);
 
         List<CardStadiumOutputDTO> result = new(cards.Count);
@@ -297,7 +299,7 @@ public static class CardsEndpoints
             .AsNoTracking()
             .AsSplitQuery()
             .WithAllIncludes()
-            .FirstOrDefaultAsync(c => c.Id == id, ct);
+            .FirstOrDefaultAsync(c => c.Id == id && c.Collection.Code != ExcludedExpansionCode, ct);
         
         if (card is null)
         {
@@ -316,7 +318,7 @@ public static class CardsEndpoints
             .AsNoTracking()
             .AsSplitQuery()
             .WithAllIncludes()
-            .FirstOrDefaultAsync(c => c.Collection.Code == request.CollectionCode && c.CollectionNumber == request.CollectionNumber, ct);
+            .FirstOrDefaultAsync(c => c.Collection.Code == request.CollectionCode && c.CollectionNumber == request.CollectionNumber && c.Collection.Code != ExcludedExpansionCode, ct);
         
         if (card is null)
             return Results.NotFound();
@@ -350,7 +352,7 @@ public static class CardsEndpoints
             .AsNoTracking()
             .AsSplitQuery()
             .WithAllIncludes()
-            .Where(c => targetCodes.Contains(c.Collection.Code)).Include(card => card.Collection)
+            .Where(c => targetCodes.Contains(c.Collection.Code) && c.Collection.Code != ExcludedExpansionCode).Include(card => card.Collection)
             .ToListAsync(ct);
 
         Dictionary<(string Code, int Num), Card> byPair = cards
@@ -391,7 +393,7 @@ public static class CardsEndpoints
             .AsNoTracking()
             .Include(cp => cp.Type)
             .Include(cp => cp.Card).ThenInclude(c => c.Collection)
-            .Where(cp => keys.Contains(cp.Card.Collection.Code.ToLower() + "-" + cp.Card.CollectionNumber))
+            .Where(cp => keys.Contains(cp.Card.Collection.Code.ToLower() + "-" + cp.Card.CollectionNumber) && cp.Card.Collection.Code != ExcludedExpansionCode)
             .ToListAsync(ct);
 
         var typeIds = pokemons
@@ -410,6 +412,7 @@ public static class CardsEndpoints
         var cards = await db.Cards
             .AsNoTracking()
             .Include(c => c.Translations)
+            .Where(c => c.Collection.Code != ExcludedExpansionCode)
             .Select(c => new
             {
                 c.Name,
@@ -472,6 +475,7 @@ public static class CardsEndpoints
         List<CardCollection> collections = await db.CardSets
             .AsNoTracking()
             .Include(c => c.Translations)
+            .Where(c => c.Code != ExcludedExpansionCode)
             .ToListAsync(ct);
 
         List<ExpansionOutputDTO> expansions = [];
